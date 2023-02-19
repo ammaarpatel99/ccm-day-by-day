@@ -8,7 +8,6 @@ import {initializeApp, provideFirebaseApp} from "@angular/fire/app";
 import {environment} from "../environments/environment";
 import {connectFunctionsEmulator, getFunctions, provideFunctions} from "@angular/fire/functions";
 import { SetupComponent } from './setup/setup.component';
-import { SuccessComponent } from './success/success.component';
 import {MatCardModule} from "@angular/material/card";
 import {MatStepperModule} from "@angular/material/stepper";
 import {MatButtonModule} from "@angular/material/button";
@@ -17,12 +16,16 @@ import {MatDividerModule} from "@angular/material/divider";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatToolbarModule} from "@angular/material/toolbar";
+import { SetupSuccessComponent } from './setup-success/setup-success.component';
+import { SubscriptionComponent } from './subscription/subscription.component';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
     AppComponent,
     SetupComponent,
-    SuccessComponent
+    SetupSuccessComponent,
+    SubscriptionComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +47,8 @@ import {MatToolbarModule} from "@angular/material/toolbar";
     FormsModule,
     ReactiveFormsModule,
     MatSlideToggleModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatProgressSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

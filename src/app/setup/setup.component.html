@@ -1,3 +1,4 @@
+<!-- TODO: Check all the text on this page -->
 <mat-stepper orientation="vertical" linear #stepper>
   <mat-step [completed]="amount.valid && amount.dirty">
     <ng-template matStepLabel>Choose Your Daily Amount</ng-template>
@@ -34,7 +35,7 @@
       <br/>
       <ng-container *ngIf="(amount.value || 0) >= 30">
         <p>
-          We will be gifting framed bricks of the Mosque to the first 300 donors to commit and complete £30 a day during Ramadan.
+          We will be gifting framed bricks of the Mosque to the first 300 donors to commit and complete at least £30 a day during Ramadan.
           if you do not want to receive the brick, even if you are eligible, please untick the below option.
         </p>
         <mat-slide-toggle color="primary" [formControl]="details.controls.brick">
