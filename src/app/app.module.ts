@@ -7,10 +7,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {initializeApp, provideFirebaseApp} from "@angular/fire/app";
 import {environment} from "../environments/environment";
 import {connectFunctionsEmulator, getFunctions, provideFunctions} from "@angular/fire/functions";
+import { SetupComponent } from './setup/setup.component';
+import { SuccessComponent } from './success/success.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SetupComponent,
+    SuccessComponent
   ],
   imports: [
     BrowserModule,
