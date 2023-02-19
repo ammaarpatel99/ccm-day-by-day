@@ -9,6 +9,14 @@ import {environment} from "../environments/environment";
 import {connectFunctionsEmulator, getFunctions, provideFunctions} from "@angular/fire/functions";
 import { SetupComponent } from './setup/setup.component';
 import { SuccessComponent } from './success/success.component';
+import {MatCardModule} from "@angular/material/card";
+import {MatStepperModule} from "@angular/material/stepper";
+import {MatButtonModule} from "@angular/material/button";
+import {MatInputModule} from "@angular/material/input";
+import {MatDividerModule} from "@angular/material/divider";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {MatToolbarModule} from "@angular/material/toolbar";
 
 @NgModule({
   declarations: [
@@ -27,7 +35,16 @@ import { SuccessComponent } from './success/success.component';
         connectFunctionsEmulator(functions, 'localhost', 5001);
       }
       return functions;
-    })
+    }),
+    MatCardModule,
+    MatStepperModule,
+    MatButtonModule,
+    MatInputModule,
+    MatDividerModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatSlideToggleModule,
+    MatToolbarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

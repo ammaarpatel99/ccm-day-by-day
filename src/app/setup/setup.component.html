@@ -1,1 +1,102 @@
-
+<mat-stepper orientation="vertical" linear #stepper>
+  <mat-step [completed]="amount.valid && amount.dirty">
+    <ng-template matStepLabel>Choose Your Daily Amount</ng-template>
+    <div class="amounts-container">
+      <button mat-raised-button color="primary" (click)="setAmount(30, stepper)">£30</button>
+      <button mat-raised-button color="primary" (click)="setAmount(60, stepper)">£60</button>
+      <button mat-raised-button color="primary" (click)="setAmount(90, stepper)">£90</button>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="custom-amounts-container">
+      <mat-form-field floatLabel="always">
+        <mat-label>Custom Amount</mat-label>
+        <input matInput type="number" placeholder="30.00"  [formControl]="amount">
+        <span matTextPrefix>£&nbsp;</span>
+      </mat-form-field>
+      <button mat-stroked-button color="primary" matStepperNext [disabled]="amount.invalid || amount.pristine">NEXT</button>
+    </div>
+  </mat-step>
+  <mat-step [stepControl]="details">
+    <ng-template matStepLabel>Enter Your Details</ng-template>
+    <form [formGroup]="details">
+      <h3>Contact Details:</h3>
+      <mat-form-field>
+        <mat-label>Email</mat-label>
+        <input matInput placeholder="xxx@example.com" [formControl]="details.controls.email">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Phone Number</mat-label>
+        <input matInput placeholder="+XX XXXX XXXXXX" [formControl]="details.controls.phone">
+      </mat-form-field>
+      <h3>Donation Details:</h3>
+      <p>If you do not wish your donation to be noted on our website and other media, please check the anonymous option.</p>
+      <mat-slide-toggle color="primary" [formControl]="details.controls.anonymous">Anonymous</mat-slide-toggle>
+      <br/>
+      <ng-container *ngIf="(amount.value || 0) >= 30">
+        <p>
+          We will be gifting framed bricks of the Mosque to the first 300 donors to commit and complete £30 a day during Ramadan.
+          if you do not want to receive the brick, even if you are eligible, please untick the below option.
+        </p>
+        <mat-slide-toggle color="primary" [formControl]="details.controls.brick">
+          Receive Framed Brick if Eligible
+        </mat-slide-toggle>
+      </ng-container>
+      <br/>
+      <ng-container *ngIf="!details.controls.anonymous.value || !!details.controls.brick.value">
+        <p>You can make the donation under your own name or someone else's.
+        <span *ngIf="!!details.controls.brick.value">
+          If you are gifted a framed brick of the Mosque as a thanks for your donation, this will be on the plaque.
+        </span>
+        Max 25 characters.</p>
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input matInput [formControl]="details.controls.name">
+        </mat-form-field>
+      </ng-container>
+      <button mat-stroked-button color="primary" [disabled]="details.invalid" matStepperNext>NEXT</button>
+    </form>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Setup Your Payment</ng-template>
+    <h3>Summary:</h3>
+    <p>Daily Amount: {{amount.value | currency: "GBP"}}</p>
+    <p>Start Date: 23/03/2023</p>
+    <p>Durations: 30 days</p>
+    <p>Email: {{details.controls.email.value}}</p>
+    <p>Phone Number: {{details.controls.phone.value}}</p>
+    <br/>
+    <p>Anonymous: {{details.controls.anonymous.value}}</p>
+    <p *ngIf="(amount.value || 0) >= 0">Receive Framed Brick if Eligible: {{details.controls.brick.value}}</p>
+    <p *ngIf="!!details.controls.name.value">Name: {{details.controls.name.value}}</p>
+    <h3>Gift Aid:</h3>
+    <p>
+      If you are a UK taxpayer and are eligible for Gift Aid, you may select the below option.
+      If you do we will get in touch regarding registering your Day By Day donation for Gift Aid, which will result
+      in the <b>government contributing an additional 25%</b> to your donation.
+    </p>
+    <mat-slide-toggle [formControl]="disclaimers.controls.giftAid" color="primary">Gift Aid</mat-slide-toggle>
+    <h3>Data & Privacy Policy:</h3>
+    <mat-slide-toggle [formControl]="disclaimers.controls.privacyPolicy" color="primary">
+      Accept our <a href="https://cambridgecentralmosque.org/legal/">Data & Privacy Policy</a>
+    </mat-slide-toggle>
+    <h3>Disclaimer:</h3>
+    <p>
+      Disclaimer - All money given to the Cambridge Central Mosque through this scheme is a donation to the
+      Cambridge Mosque Trust. Any framed bricks distributed are gifts given at the Trust's discretion
+      in line with their Day By Day Ramadan 2023 Scheme. The Turst may change the Terms of the Day By Day Scheme
+      at its discretion.
+    </p>
+    <mat-slide-toggle [formControl]="disclaimers.controls.disclaimer" color="primary">I accept the disclaimer</mat-slide-toggle>
+    <h2>Setup the Donation</h2>
+    <p>
+      The button below will allow you to enter your payment details. The name and address it asks for are the name
+      and address of the one making the donation, even if it is on behalf of someone else.
+      <br/>
+      The payments are processed by Stripe, who charges a transaction fee. <b>Please note the transaction fees are lower
+      when paying via direct debit, so please prefer this payment option if possible.</b>
+    </p>
+    <button mat-raised-button color="primary" [disabled]="disclaimers.invalid" (click)="setupPayment()">
+      Setup Donation
+    </button>
+  </mat-step>
+</mat-stepper>

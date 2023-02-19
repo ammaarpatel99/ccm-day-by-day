@@ -11,12 +11,10 @@ const stripe = new Stripe(stripeKey, {apiVersion: "2022-11-15"});
 export const stripeSetup = functions.https.onCall(async (data, context) => {
   context.rawRequest.header("referer");
   const successURL = data.successURL;
-  const cancelURL = data.cancelURL;
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card", "bacs_debit", "sepa_debit"],
     mode: "setup",
     success_url: successURL + "{CHECKOUT_SESSION_ID}",
-    cancel_url: cancelURL,
     customer_creation: "always",
   });
   const sessionURL = session.url as string;
