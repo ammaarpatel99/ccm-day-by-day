@@ -65,8 +65,8 @@
     <p>Email: {{details.controls.email.value}}</p>
     <p>Phone Number: {{details.controls.phone.value}}</p>
     <br/>
-    <p>Anonymous: {{details.controls.anonymous.value}}</p>
-    <p *ngIf="(amount.value || 0) >= 0">Receive Framed Brick if Eligible: {{details.controls.brick.value}}</p>
+    <p>Anonymous: {{details.controls.anonymous.value ? "Yes" : "No"}}</p>
+    <p *ngIf="(amount.value || 0) >= 0">Receive Framed Brick if Eligible: {{details.controls.brick.value ? "Yes" : "No"}}</p>
     <p *ngIf="!!details.controls.name.value">Name: {{details.controls.name.value}}</p>
     <h3>Gift Aid:</h3>
     <p>
