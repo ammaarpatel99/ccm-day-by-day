@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Functions, httpsCallable} from "@angular/fire/functions";
 import {MatStepper} from "@angular/material/stepper";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {AsyncSubject, combineLatest, combineLatestWith, first, of, takeUntil} from "rxjs";
+import {AsyncSubject, combineLatest, takeUntil} from "rxjs";
 
 @Component({
   selector: 'app-setup',
@@ -13,7 +13,7 @@ export class SetupComponent implements OnInit, OnDestroy {
   private readonly destroyed = new AsyncSubject();
 
   readonly amount = new FormControl<number>(30, [
-    Validators.min(1),
+    Validators.min(1), // TODO: change minimum donation amount
     control =>
     Math.floor(control.value * 100) / 100 === control.value ? null
       : {invalidAmount: `Amount cannot have more than 2 decimal places.`}
@@ -64,7 +64,14 @@ export class SetupComponent implements OnInit, OnDestroy {
 
   setupPayment() {
     httpsCallable<any, any>(this.functions, 'stripeSetup')({
-      successURL: `${location.origin}/success/`
+      successURL: `${location.origin}/setup/success`,
+      amount: this.amount.value as number * 100,
+      email: this.details.controls.email.value,
+      phone: this.details.controls.phone.value,
+      name: this.details.controls.name.value,
+      brick: this.details.controls.brick.value,
+      anonymous: this.details.controls.anonymous.value,
+      giftAid: this.disclaimers.controls.giftAid.value
     }).then(res => {
       window.location.href = res.data.sessionURL;
     })
