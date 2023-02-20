@@ -16,17 +16,16 @@ export async function sendConfirmationEmail(
       html: "Thank you for setting up your donation to Cambridge Central" +
         " Mosque for Ramadan 2023 through our Day By Day scheme." +
         " The details are below:\n" +
-        "\nName: " + data.name +
-        "\nAnonymous: " + data.anonymous ? "Yes" : "No" +
         "\nID: " + docID +
         "\nAmount: " + data.amount +
         "\nStart Date: " + data.startDate.toDate().toLocaleDateString() +
         (data.startDate.toDate() > new Date() ? " (estimate)" : "") +
         "\nDays: " + data.iterations +
+        "\n\nName: " + data.name +
+        "\nAnonymous: " + data.anonymous ? "Yes" : "No" +
         "\n\nEmail: " + data.email +
         "\nPhone Number: " + data.phone +
         "\nGift Aid: " + data.giftAid ? "Yes" : "No" +
-        "\nID: " + docID +
         "\n\nBest wishes," +
         "\nAdmin Team" +
         "\n<a href='cambridgecentralmosque.org'>" +
