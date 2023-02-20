@@ -17,21 +17,17 @@ export interface BaseSubscription {
   amount: number;
   iterations: number;
   startDate: Timestamp;
+  customerID: string;
 }
 
 export interface ActiveSubscription extends BaseSubscription {
-  customerID: string;
   scheduleID: string;
   subscriptionID: string;
   created: Timestamp;
-  continuedFrom?: DocumentReference;
+  confirmationEmail: DocumentReference;
 }
 
-interface EndedSubscription extends ActiveSubscription {
-  abruptEnd: Timestamp;
-}
-
-type Subscription = BaseSubscription | ActiveSubscription | EndedSubscription;
+type Subscription = BaseSubscription | ActiveSubscription;
 
 interface Email {
   to: string;
