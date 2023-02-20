@@ -63,8 +63,11 @@ export async function setDefaultPaymentMethod(customerID: string) {
 /**
  * Creates a subscription schedule that charges daily.
  * @param {BaseSubscription} data
+ * @param {string} firestoreDocID
  */
-export async function createSubscriptionSchedule(data: BaseSubscription) {
+export async function createSubscriptionSchedule(
+  data: BaseSubscription, firestoreDocID: string,
+) {
   const startDate = Math.floor(data.startDate.toDate().getTime() / 1000);
   const last10Days =
     data.startDate.toDate().getTime() == SETTINGS.last10Days.getTime();
@@ -88,5 +91,12 @@ export async function createSubscriptionSchedule(data: BaseSubscription) {
         iterations: data.iterations,
       },
     ],
+    metadata: {
+      name: data.name,
+      anonymous: JSON.stringify(data.anonymous),
+      giftAid: JSON.stringify(data.giftAid),
+      wantsBrick: JSON.stringify(data.wantsBrick),
+      firestoreDocID,
+    },
   });
 }
