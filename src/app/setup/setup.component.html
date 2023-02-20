@@ -38,22 +38,20 @@
           We will be gifting framed bricks of the Mosque to the first 300 donors to commit and complete at least £30 a day during Ramadan.
           if you do not want to receive the brick, even if you are eligible, please untick the below option.
         </p>
-        <mat-slide-toggle color="primary" [formControl]="details.controls.brick">
+        <mat-slide-toggle color="primary" [formControl]="details.controls.wantsBrick">
           Receive Framed Brick if Eligible
         </mat-slide-toggle>
       </ng-container>
       <br/>
-      <ng-container *ngIf="!details.controls.anonymous.value || !!details.controls.brick.value">
-        <p>You can make the donation under your own name or someone else's.
-        <span *ngIf="!!details.controls.brick.value">
-          If you are gifted a framed brick of the Mosque as a thanks for your donation, this will be on the plaque.
-        </span>
-        Max 25 characters.</p>
-        <mat-form-field>
-          <mat-label>Name</mat-label>
-          <input matInput [formControl]="details.controls.name">
-        </mat-form-field>
-      </ng-container>
+      <p>You can make the donation under your own name or someone else's.
+      <span *ngIf="!!details.controls.wantsBrick.value">
+        If you are gifted a framed brick of the Mosque as a thanks for your donation, this will be on the plaque.
+      </span>
+      Max 25 characters.</p>
+      <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput [formControl]="details.controls.name">
+      </mat-form-field>
       <button mat-stroked-button color="primary" [disabled]="details.invalid" matStepperNext>NEXT</button>
     </form>
   </mat-step>
@@ -67,7 +65,7 @@
     <p>Phone Number: {{details.controls.phone.value}}</p>
     <br/>
     <p>Anonymous: {{details.controls.anonymous.value ? "Yes" : "No"}}</p>
-    <p *ngIf="(amount.value || 0) >= 0">Receive Framed Brick if Eligible: {{details.controls.brick.value ? "Yes" : "No"}}</p>
+    <p *ngIf="(amount.value || 0) >= 0">Receive Framed Brick if Eligible: {{details.controls.wantsBrick.value ? "Yes" : "No"}}</p>
     <p *ngIf="!!details.controls.name.value">Name: {{details.controls.name.value}}</p>
     <h3>Gift Aid:</h3>
     <p>

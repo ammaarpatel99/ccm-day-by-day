@@ -2,6 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {SubscriptionService} from "./subscription.service";
 import {Functions, httpsCallable} from "@angular/fire/functions";
 
+interface StripeSubData {
+  sessionID: string;
+  docID: string;
+}
+
 enum SubscriptionState {
   NOT_FOUND,
   IN_PROGRESS,
@@ -28,7 +33,7 @@ export class SubscriptionComponent implements OnInit {
       this.state = SubscriptionState.NOT_FOUND
       return
     }
-    httpsCallable<any, any>(this.functions, `stripeSub`)({
+    httpsCallable<StripeSubData, any>(this.functions, `stripeSub`)({
       sessionID: this.subscriptionService.sessionID,
       docID: this.subscriptionService.docID
     }).then(() => this.state = SubscriptionState.COMPLETE)

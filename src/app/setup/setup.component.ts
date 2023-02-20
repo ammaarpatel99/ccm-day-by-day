@@ -4,6 +4,23 @@ import {MatStepper} from "@angular/material/stepper";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {AsyncSubject, combineLatest, takeUntil} from "rxjs";
 
+interface StripeSetupData {
+  successURL: string;
+  amount: number;
+  email: string;
+  phone: string;
+  name: string;
+  wantsBrick: boolean;
+  anonymous: boolean;
+  giftAid: boolean;
+  startDate: number;
+  iterations: number;
+}
+
+interface StripeSetupRes {
+  sessionURL: string;
+}
+
 @Component({
   selector: 'app-setup',
   templateUrl: './setup.component.html',
@@ -13,7 +30,7 @@ export class SetupComponent implements OnInit, OnDestroy {
   private readonly destroyed = new AsyncSubject();
 
   readonly amount = new FormControl<number>(30, [
-    Validators.min(1), // TODO: change minimum donation amount
+    Validators.min(30),
     control =>
     Math.floor(control.value * 100) / 100 === control.value ? null
       : {invalidAmount: `Amount cannot have more than 2 decimal places.`}
@@ -23,7 +40,7 @@ export class SetupComponent implements OnInit, OnDestroy {
     email: new FormControl('', [Validators.email, Validators.required]),
     phone: new FormControl('', Validators.required),
     name: new FormControl('', [Validators.required, Validators.maxLength(25)]),
-    brick: new FormControl(false),
+    wantsBrick: new FormControl(false),
     anonymous: new FormControl(false)
   })
 
@@ -41,9 +58,9 @@ export class SetupComponent implements OnInit, OnDestroy {
     this.amount.valueChanges.pipe(
       takeUntil(this.destroyed)
     ).subscribe(value => {
-      this.details.controls.brick.setValue((value || 0) >= 30)
+      this.details.controls.wantsBrick.setValue((value || 0) >= 30)
     })
-    combineLatest([this.details.controls.anonymous.valueChanges, this.details.controls.brick.valueChanges]).pipe(
+    combineLatest([this.details.controls.anonymous.valueChanges, this.details.controls.wantsBrick.valueChanges]).pipe(
       takeUntil(this.destroyed)
     ).subscribe(([anonymous, brick]) => {
       if (anonymous && !brick) {
@@ -63,15 +80,17 @@ export class SetupComponent implements OnInit, OnDestroy {
   }
 
   setupPayment() {
-    httpsCallable<any, any>(this.functions, 'stripeSetup')({
+    httpsCallable<StripeSetupData, StripeSetupRes>(this.functions, 'stripeSetup')({
       successURL: `${location.origin}/setup/success`,
       amount: this.amount.value as number * 100,
-      email: this.details.controls.email.value,
-      phone: this.details.controls.phone.value,
-      name: this.details.controls.name.value,
-      brick: this.details.controls.brick.value,
-      anonymous: this.details.controls.anonymous.value,
-      giftAid: this.disclaimers.controls.giftAid.value
+      email: this.details.controls.email.value as string,
+      phone: this.details.controls.phone.value as string,
+      name: this.details.controls.name.value as string,
+      wantsBrick: this.details.controls.wantsBrick.value as boolean,
+      anonymous: this.details.controls.anonymous.value as boolean,
+      giftAid: this.disclaimers.controls.giftAid.value as boolean,
+      iterations: 30,
+      startDate: new Date("2023-03-23").getTime()
     }).then(res => {
       window.location.href = res.data.sessionURL;
     })
