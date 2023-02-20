@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import Stripe from "stripe";
 import {initializeApp} from "firebase-admin/app";
-import {getFirestore} from "firebase-admin/lib/firestore";
+import {getFirestore} from "firebase-admin/firestore";
 
 const app = initializeApp();
 const firestore = getFirestore(app);
@@ -34,6 +34,7 @@ export const stripeSetup = functions.https.onCall(async (data, context) => {
     mode: "setup",
     success_url: successURL + `/${docID}/{CHECKOUT_SESSION_ID}`,
     customer_creation: "always",
+    customer_email: email,
   });
   const sessionURL = session.url as string;
   return {
@@ -43,12 +44,19 @@ export const stripeSetup = functions.https.onCall(async (data, context) => {
 
 export const stripeSub = functions.https.onCall(async (data) => {
   const sessionID = data.sessionID;
-  const price = data.price as number;
+  const docID = data.docID;
+  const docRef = firestore.collection("subscriptions").doc(docID);
+  const doc = await docRef.get();
+  if (!doc.exists || doc.data() === undefined) {
+    throw new Error("Doc doesn't exist");
+  }
+  const docData = doc.data() as any;
+  const price = docData.amount as number;
   const session = await stripe.checkout.sessions.retrieve(sessionID);
-  const customer = session.customer as string;
-  const subSchedule = await stripe.subscriptionSchedules.create({
-    customer: customer,
-    start_date: Math.floor(new Date("2023-03-23").getTime() / 1000),
+  const customerID = session.customer as string;
+  const schedule = await stripe.subscriptionSchedules.create({
+    customer: customerID,
+    start_date: Math.floor(new Date("2023-01-23").getTime() / 1000),
     end_behavior: "cancel",
     phases: [
       {
@@ -65,5 +73,12 @@ export const stripeSub = functions.https.onCall(async (data) => {
       },
     ],
   });
-  return subSchedule;
+  const scheduleID = schedule.id;
+  const subscriptionID = schedule.subscription;
+  const createdTime = schedule.created;
+  await docRef.update({
+    customerID, scheduleID, subscriptionID, createdTime,
+  });
+  // TODO: send email confirming subscription
+  return schedule;
 });
