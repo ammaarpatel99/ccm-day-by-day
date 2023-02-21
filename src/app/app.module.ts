@@ -19,13 +19,15 @@ import {MatToolbarModule} from "@angular/material/toolbar";
 import { SetupSuccessComponent } from './setup-success/setup-success.component';
 import { SubscriptionComponent } from './subscription/subscription.component';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import { LoadingComponent } from './loading/loading.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SetupComponent,
     SetupSuccessComponent,
-    SubscriptionComponent
+    SubscriptionComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,

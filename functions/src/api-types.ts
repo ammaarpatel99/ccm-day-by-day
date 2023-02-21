@@ -6,7 +6,12 @@ import {
 } from "./helpers";
 
 export enum APIEndpoints {
-  CONFIG = "config"
+  CONFIG = "config",
+  PRE_CHECKOUT_SUMMARY = "preCheckoutSummary",
+  CHECKOUT_SUMMARY = "checkoutSummary",
+  SETUP_PAYMENT = "setupPayment",
+  SET_DEFAULT_PAYMENT_METHOD = "setDefaultPayment",
+  SETUP_SUBSCRIPTION = "setupSubscription"
 }
 
 export type ConfigReq = void;

@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import {SetupComponent} from "./setup/setup.component";
 import {SetupSuccessComponent} from "./setup-success/setup-success.component";
 import {SubscriptionComponent} from "./subscription/subscription.component";
+import {LoadingComponent} from "./loading/loading.component";
 
 const routes: Routes = [
   {
@@ -19,8 +20,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    pathMatch: 'full',
-    redirectTo: '/setup'
+    component: LoadingComponent
   }
 ];
 
