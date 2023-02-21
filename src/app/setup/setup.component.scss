@@ -20,3 +20,12 @@ button {
 * {
   width: 100%;
 }
+
+.actions-container {
+  display: flex;
+  * {
+    flex-grow: 1;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+  }
+}

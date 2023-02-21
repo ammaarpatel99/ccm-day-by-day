@@ -40,12 +40,12 @@ export class SetupService {
       tap(() => this._checkoutState = CheckoutState.PRE_CHECKOUT_LOADING),
       switchMap(() =>
         from(httpsCallable<PreCheckoutSummaryReq, PreCheckoutSummaryRes>(this.functions, APIEndpoints.PRE_CHECKOUT_SUMMARY)({
-          email: this.applicationService.donorInfo.controls.email.value as string,
-          phone: this.applicationService.donorInfo.controls.phone.value as string,
+          email: this.applicationService.contactInfo.controls.email.value as string,
+          phone: this.applicationService.contactInfo.controls.phone.value as string,
           name: this.applicationService.donorInfo.controls.name.value as string,
-          wantsBrick: this.applicationService.additionalInfo.controls.wantsBrick.value as boolean,
-          giftAid: this.applicationService.additionalInfo.controls.giftAid.value as boolean,
-          anonymous: this.applicationService.additionalInfo.controls.anonymous.value as boolean,
+          wantsBrick: this.applicationService.donorInfo.controls.wantsBrick.value as boolean,
+          giftAid: this.applicationService.consent.controls.giftAid.value as boolean,
+          anonymous: this.applicationService.donorInfo.controls.anonymous.value as boolean,
           amount: this.applicationService.donationAmount.value as number,
           donationLength: this.applicationService.donationLength.value as DonationLength
         }))
@@ -72,18 +72,20 @@ export class SetupService {
       tap(() => this._checkoutState = CheckoutState.BEGUN),
       switchMap(() =>
         from(httpsCallable<SetupPaymentReq, SetupPaymentRes>(this.functions, APIEndpoints.SETUP_PAYMENT)({
-          email: this.applicationService.donorInfo.controls.email.value as string,
-          phone: this.applicationService.donorInfo.controls.phone.value as string,
+          email: this.applicationService.contactInfo.controls.email.value as string,
+          phone: this.applicationService.contactInfo.controls.phone.value as string,
           name: this.applicationService.donorInfo.controls.name.value as string,
-          wantsBrick: this.applicationService.additionalInfo.controls.wantsBrick.value as boolean,
-          giftAid: this.applicationService.additionalInfo.controls.giftAid.value as boolean,
-          anonymous: this.applicationService.additionalInfo.controls.anonymous.value as boolean,
+          wantsBrick: this.applicationService.donorInfo.controls.wantsBrick.value as boolean,
+          giftAid: this.applicationService.consent.controls.giftAid.value as boolean,
+          anonymous: this.applicationService.donorInfo.controls.anonymous.value as boolean,
           amount: this.applicationService.donationAmount.value as number,
           donationLength: this.applicationService.donationLength.value as DonationLength,
           successURL: this.successURL
         }))
       ),
-      map(({data}) => data)
+      map(({data}) => {
+        location.replace(data.setupURL)
+      })
     )
   }
 

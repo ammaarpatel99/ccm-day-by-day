@@ -22,15 +22,15 @@ export class DonationApplicationService implements OnInit, OnDestroy {
   get eligibleForBrick() {return this._eligibleForBrick}
   readonly donorInfo = new FormGroup({
     name: new FormControl("", [Validators.required, Validators.minLength(25)]),
+    anonymous: new FormControl(false, Validators.required),
+    wantsBrick: new FormControl(true, Validators.required)
+  })
+  readonly contactInfo = new FormGroup({
     email: new FormControl("", [Validators.required, Validators.email]),
     phone: new FormControl("", Validators.required)
   })
-  readonly additionalInfo = new FormGroup({
-    anonymous: new FormControl(false, Validators.required),
-    wantsBrick: new FormControl(true, Validators.required),
-    giftAid: new FormControl(false, Validators.required)
-  })
   readonly consent = new FormGroup({
+    giftAid: new FormControl(false, Validators.required),
     privacy: new FormControl(false, [Validators.required, Validators.requiredTrue]),
     disclaimer: new FormControl(false, [Validators.required, Validators.requiredTrue])
   })
@@ -76,8 +76,11 @@ export class DonationApplicationService implements OnInit, OnDestroy {
   private setupAmounts(presetAmounts: number[], minimum: number, target: number) {
     this._showPresetAmounts = presetAmounts.length === 0 ? false : presetAmounts
     this.donationAmount.setValue(target)
-    this.donationAmount.addValidators([Validators.required, control =>
-      control.value >= minimum ? null : {lowDonationAmount: "lowDonationAmount"}
+    this.donationAmount.addValidators([
+      Validators.required, Validators.min(minimum),
+      control =>
+        Math.floor(control.value * 100) / 100 === control.value ? null
+          : {invalidAmount: `Amount cannot have more than 2 decimal places.`}
     ])
   }
 

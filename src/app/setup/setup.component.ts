@@ -1,103 +1,173 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Functions, httpsCallable} from "@angular/fire/functions";
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatStepper} from "@angular/material/stepper";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {AsyncSubject, combineLatest, takeUntil} from "rxjs";
-
-interface StripeSetupData {
-  successURL: string;
-  amount: number;
-  email: string;
-  phone: string;
-  name: string;
-  wantsBrick: boolean;
-  anonymous: boolean;
-  giftAid: boolean;
-  startDate: number;
-  iterations: number;
-}
-
-interface StripeSetupRes {
-  sessionURL: string;
-}
+import {DonationApplicationService} from "../services/donation-application.service";
+import {CheckoutState, SetupService} from "../services/setup.service";
+import {DonationLength} from "../../../functions/src/api-types";
+import {ConfigService} from "../services/config.service";
+import {map, switchMap} from "rxjs";
+import {DonationCheckoutSummary, DonationSummary} from "../../../functions/src/helpers";
 
 @Component({
   selector: 'app-setup',
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.scss']
 })
-export class SetupComponent implements OnInit, OnDestroy {
-  private readonly destroyed = new AsyncSubject();
-
-  readonly amount = new FormControl<number>(30, [
-    Validators.min(30),
-    control =>
-    Math.floor(control.value * 100) / 100 === control.value ? null
-      : {invalidAmount: `Amount cannot have more than 2 decimal places.`}
-  ])
-
-  details = new FormGroup({
-    email: new FormControl('', [Validators.email, Validators.required]),
-    phone: new FormControl('', Validators.required),
-    name: new FormControl('', [Validators.required, Validators.maxLength(25)]),
-    wantsBrick: new FormControl(false),
-    anonymous: new FormControl(false)
-  })
-
-  disclaimers = new FormGroup({
-    giftAid: new FormControl(false),
-    privacyPolicy: new FormControl(false, Validators.requiredTrue),
-    disclaimer: new FormControl(false, Validators.requiredTrue)
-  })
-
-  constructor(
-    private readonly functions: Functions
-  ) { }
-
-  ngOnInit(): void {
-    this.amount.valueChanges.pipe(
-      takeUntil(this.destroyed)
-    ).subscribe(value => {
-      this.details.controls.wantsBrick.setValue((value || 0) >= 30)
-    })
-    combineLatest([this.details.controls.anonymous.valueChanges, this.details.controls.wantsBrick.valueChanges]).pipe(
-      takeUntil(this.destroyed)
-    ).subscribe(([anonymous, brick]) => {
-      if (anonymous && !brick) {
-        this.details.controls.name.clearValidators()
-        this.details.controls.name.setValue('')
-      } else {
-        this.details.controls.name.addValidators([Validators.required, Validators.maxLength(25)])
-      }
-      this.details.controls.name.updateValueAndValidity()
-    })
+export class SetupComponent implements OnInit {
+  @ViewChild('stepper') private stepper!: MatStepper;
+  get showDonationLengths() {
+    return this.applicationService.showDonationLengths
   }
 
-  setAmount(amount: number, stepper: MatStepper) {
+  get showBackdatingNote() {
+    return this.applicationService.showNoteAboutBackdating
+  }
+
+  get showPresetAmounts() {
+    return this.applicationService.showPresetAmounts
+  }
+
+  get amount() {
+    return this.applicationService.donationAmount
+  }
+
+  get donationLength() {
+    return this.applicationService.donationLength
+  }
+
+  get donorInfo() {
+    return this.applicationService.donorInfo
+  }
+
+  get contactInfo() {
+    return this.applicationService.contactInfo
+  }
+
+  get consent() {
+    return this.applicationService.consent
+  }
+
+  get eligibleForBrick() {
+    return this.applicationService.eligibleForBrick
+  }
+
+  get minimumAmount() {
+    return this.configService.config$.pipe(
+      map(data => data.minimumAmount)
+    )
+  }
+
+  private _checkoutSummary: DonationCheckoutSummary | null = null;
+  get checkoutSummary() {
+    return this._checkoutSummary
+  }
+
+  private _fullSummary: DonationSummary | null = null;
+  get fullSummary() {
+    return this._fullSummary
+  }
+
+  get checkoutState() {
+    return this.setupService.checkoutState
+  }
+
+  get checkoutStates() {
+    return CheckoutState
+  }
+
+  private _checkoutLoadingState: {
+    show: boolean; mode: 'indeterminate'|'query'|'determinate'; value: number
+  } = {show: false, mode: 'query', value: 0}
+  get checkoutLoadingState() {
+    return this._checkoutLoadingState
+  }
+
+  get canEdit() {
+    return this.checkoutState === this.checkoutStates.NOT_BEGUN
+  }
+
+  get donationLengthComplete() {
+    return !this.showDonationLengths || (this.donationLength.valid && this.donationLength.dirty)
+  }
+
+  get donationAmountComplete() {
+    return this.amount.valid && this.amount.dirty
+  }
+
+  get donationDetailsComplete() {
+    return this.donorInfo.valid && this.contactInfo.valid && this.consent.valid
+  }
+
+  getDonationLengthText(donationLength: DonationLength) {
+    switch (donationLength) {
+      case DonationLength.FULL_RAMADAN:
+        return "30 Days of Ramadan"
+      case DonationLength.REMAINING_DAYS:
+        return "Remaining Days of Ramadan"
+      case DonationLength.LAST_10_DAYS:
+        return "Last 10 Days of Ramadan"
+    }
+  }
+
+  selectDonationLength(donationLength: DonationLength) {
+    this.donationLength.setValue(donationLength);
+    this.donationLength.markAsDirty();
+    setTimeout(() => this.stepper.next(), 100)
+  }
+
+  setAmount(amount: number) {
     this.amount.setValue(amount);
     this.amount.markAsDirty();
-    setTimeout(() => stepper.next(), 100)
+    setTimeout(() => this.stepper.next(), 100)
+  }
+
+  stepperSelectionChange(index: number) {
+    if (index === 3) {
+      this._checkoutSummary = null
+      this._checkoutLoadingState = {show: true, mode: 'query', value: 0}
+      this.setupService.getPreCheckoutSummary().subscribe(data => {
+        this._checkoutSummary = data
+        this._checkoutLoadingState = {show: false, mode: 'query', value: 0}
+      })
+    }
   }
 
   setupPayment() {
-    httpsCallable<StripeSetupData, StripeSetupRes>(this.functions, 'stripeSetup')({
-      successURL: `${location.origin}/setup/success`,
-      amount: this.amount.value as number * 100,
-      email: this.details.controls.email.value as string,
-      phone: this.details.controls.phone.value as string,
-      name: this.details.controls.name.value as string,
-      wantsBrick: this.details.controls.wantsBrick.value as boolean,
-      anonymous: this.details.controls.anonymous.value as boolean,
-      giftAid: this.disclaimers.controls.giftAid.value as boolean,
-      iterations: 30,
-      startDate: new Date("2023-03-23").getTime()
-    }).then(res => {
-      window.location.href = res.data.sessionURL;
-    })
+    this._checkoutLoadingState = {show: true, mode: "indeterminate", value: 0}
+    this.setupService.setupPayment().subscribe()
   }
 
-  ngOnDestroy(): void {
-    this.destroyed.next(true)
-    this.destroyed.complete()
+  goToMainSite() {
+    location.replace("https://cambridgecentralmosque.org/daybyday")
+  }
+
+  constructor(
+    private readonly applicationService: DonationApplicationService,
+    private readonly setupService: SetupService,
+    private readonly configService: ConfigService
+  ) { }
+
+  ngOnInit(): void {
+    if (this.checkoutState === CheckoutState.RE_ESTABLISHING) {
+      while (this.stepper.selectedIndex < 3) this.stepper.next()
+      this._checkoutLoadingState = {show: true, mode: "indeterminate", value: 0}
+      this.setupService.getCheckoutSummary().pipe(
+        map(data => {
+          this._checkoutSummary = data
+          this._checkoutLoadingState = {show: true, mode: "determinate", value: 50}
+        }),
+        switchMap(() => this.setupService.setDefaultPaymentMethod()),
+        map(() => {
+          this._checkoutLoadingState = {show: true, mode: "determinate", value: 70}
+        }),
+        switchMap(() => this.setupService.setupSubscription()),
+        map(data => {
+          this._checkoutLoadingState = {show: true, mode: "determinate", value: 100}
+          this._fullSummary = data
+          setTimeout(() => {
+            this.stepper.next()
+          }, 100)
+        })
+      ).subscribe()
+    }
   }
 }

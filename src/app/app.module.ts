@@ -16,18 +16,17 @@ import {MatDividerModule} from "@angular/material/divider";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatToolbarModule} from "@angular/material/toolbar";
-import { SetupSuccessComponent } from './setup-success/setup-success.component';
-import { SubscriptionComponent } from './subscription/subscription.component';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import { LoadingComponent } from './loading/loading.component';
+import { PaymentSetupComponent } from './payment-setup/payment-setup.component';
+import {MatProgressBarModule} from "@angular/material/progress-bar";
 
 @NgModule({
   declarations: [
     AppComponent,
     SetupComponent,
-    SetupSuccessComponent,
-    SubscriptionComponent,
-    LoadingComponent
+    LoadingComponent,
+    PaymentSetupComponent
   ],
   imports: [
     BrowserModule,
@@ -50,7 +49,8 @@ import { LoadingComponent } from './loading/loading.component';
     ReactiveFormsModule,
     MatSlideToggleModule,
     MatToolbarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatProgressBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]
