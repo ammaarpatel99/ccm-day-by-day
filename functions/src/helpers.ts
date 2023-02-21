@@ -2,21 +2,6 @@ import {SETTINGS} from "./settings";
 import {DocumentReference, Timestamp} from "firebase-admin/lib/firestore";
 import {DonationLength} from "./donationLength";
 
-export enum DonationScheme {
-  FULL,
-  PARTIAL,
-  LAST_10_DAYS,
-}
-
-
-export interface ProcessedDonationInfo {
-  startDate: Date;
-  donationScheme: DonationScheme;
-  eligibleForBrick: boolean;
-  iterations: number;
-}
-
-
 export interface DonationChoice {
   donationLength: DonationLength;
   amount: number;
@@ -28,52 +13,54 @@ export interface DonorInfo {
   phone: string;
 }
 
-export interface DonationAdditionalInfo {
+export interface DonationApplication {
+  donationLength: DonationLength;
+  amount: number;
+  name: string;
+  email: string;
+  phone: string;
   anonymous: boolean;
   wantsBrick: boolean;
   giftAid: boolean;
 }
 
-export interface DonationApplication extends
-  DonationChoice, DonorInfo, DonationAdditionalInfo
-{ }
-
-
-export interface DonorID {
-  customerID: string;
+export interface DonationApplicationWithCustomerID extends DonationApplication {
+  customerID: string
 }
 
-export interface DonationProcessingInfo extends
-  DonationApplication, DonorID {}
-
-export interface DonationInfo extends DonorID {
+export interface DonationSubscriptionInfo {
   scheduleID: string;
   subscriptionID: string;
   created: Timestamp;
   confirmationEmail: DocumentReference;
   application: DocumentReference;
+  customerID: string
 }
 
-
-export interface DonationCheckoutSummary extends
-  Omit<DonationApplication, "donationLength">,
-  Omit<ProcessedDonationInfo, "donationScheme"> {}
-
-export interface DonationSummary extends
-  DonationCheckoutSummary,
-  Omit<DonationInfo, "confirmationEmail"|"application"> {}
-
-export interface DonationCheckoutSummaryPayload extends
-  Omit<DonationApplication, "donationLength">,
-  Omit<ProcessedDonationInfo, "donationScheme" | "startDate"> {
-  startDate: number
+export enum DonationScheme {
+  FULL,
+  PARTIAL,
+  LAST_10_DAYS,
 }
 
-export interface DonationSummaryPayload extends
-  DonationCheckoutSummaryPayload,
-  Omit<DonationInfo, "confirmationEmail"|"application"|"created"> {
-  created: number
+export interface ProcessedDonationInfo {
+  startDate: Date;
+  donationScheme: DonationScheme;
+  eligibleForBrick: boolean;
+  iterations: number;
 }
+
+export type DonationCheckoutSummary =
+  DonationApplication & ProcessedDonationInfo;
+export type DonationCheckoutSummaryPayload =
+  Omit<DonationCheckoutSummary, "startDate"> & {startDate: number}
+
+export type DonationSummary =
+  DonationCheckoutSummary &
+  Omit<DonationSubscriptionInfo, "confirmationEmail"|"application">
+export type DonationSummaryPayload =
+  Omit<DonationSummary, "created"|"startDate"> &
+  {created: number; startDate: number}
 
 
 /**
@@ -95,7 +82,6 @@ function dateToday() {
   date.setHours(0, 0, 0, 0);
   return date;
 }
-
 
 /**
  * Produce payment info
@@ -140,29 +126,4 @@ export function processPaymentInfo(
       iterations,
     };
   }
-}
-
-
-/**
- * @param {DonationApplication} data
- */
-export function produceDonationSummary
-(data: DonationApplication): DonationCheckoutSummary
-/**
- * @param {DonationApplication} data
- * @param {string} subscriptionID
- */
-export function produceDonationSummary
-(data: DonationApplication, subscriptionID: string): DonationSummary
-/**
- * @param {DonationApplication} data
- * @param {string | void} subscriptionID
- * @return {DonationCheckoutSummary | DonationSummary}
- */
-export function produceDonationSummary(
-  data: DonationApplication, subscriptionID?: string
-): DonationCheckoutSummary | DonationSummary {
-  const _data = {...data, ...(processPaymentInfo(data))};
-  if (!subscriptionID) return _data;
-  else return {..._data, subscriptionID};
 }

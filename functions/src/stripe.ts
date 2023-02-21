@@ -1,8 +1,9 @@
 import Stripe from "stripe";
 import {
   DonationChoice,
-  DonationProcessingInfo,
-  DonationScheme, DonorInfo,
+  DonationApplicationWithCustomerID,
+  DonationScheme,
+  DonorInfo,
   processPaymentInfo,
 } from "./helpers";
 
@@ -99,11 +100,11 @@ export async function setDefaultPaymentMethod(customerID: string) {
 
 /**
  * Creates a subscription schedule that charges daily.
- * @param {DonationProcessingInfo} data
+ * @param {DonationApplicationWithCustomerID} data
  * @param {string} applicationID
  */
 export async function createSubscriptionSchedule(
-  data: DonationProcessingInfo, applicationID: string,
+  data: DonationApplicationWithCustomerID, applicationID: string,
 ) {
   const paymentInfo = producePaymentInfo(data);
   return await stripe.subscriptionSchedules.create({

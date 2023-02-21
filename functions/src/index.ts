@@ -17,7 +17,7 @@ import {
   SetupPaymentRes, SetupSubscriptionReq, SetupSubscriptionRes,
 } from "./api-types";
 import {SETTINGS} from "./settings";
-import {DonationInfo, produceDonationSummary} from "./helpers";
+import {DonationSubscriptionInfo, processPaymentInfo} from "./helpers";
 
 export const config = functions.https.onCall((): ConfigRes => {
   return SETTINGS;
@@ -40,8 +40,11 @@ export const setupPayment = functions.https.onCall(
 
 export const preCheckoutSummary = functions.https.onCall(
   async (data: PreCheckoutSummaryReq): Promise<PreCheckoutSummaryRes> => {
-    const _data = produceDonationSummary(data);
-    return {..._data, startDate: _data.startDate.getTime()};
+    const paymentInfo = processPaymentInfo(data);
+    return {
+      ...data, ...paymentInfo,
+      startDate: paymentInfo.startDate.getTime(),
+    };
   }
 );
 
@@ -50,8 +53,11 @@ export const checkoutSummary = functions.https.onCall(
     const doc = await db.donationApplication.doc(data.applicationID).get();
     const docData = doc.data();
     if (!docData) throw new Error("Application doesn't exist");
-    const _data = produceDonationSummary(docData);
-    return {..._data, startDate: _data.startDate.getTime()};
+    const paymentInfo = processPaymentInfo(docData);
+    return {
+      ...docData, ...paymentInfo,
+      startDate: paymentInfo.startDate.getTime(),
+    };
   }
 );
 
@@ -69,20 +75,27 @@ export const setupSubscription = functions.https.onCall(
     const doc = await db.donationApplication.doc(data.applicationID).get();
     const docData = doc.data();
     if (!docData) throw new Error("Application doesn't exist");
+
     const schedule =
       await createSubscriptionSchedule(docData, data.applicationID);
-    const summary = produceDonationSummary(
-      docData, schedule.subscription as string);
+    const paymentInfo = processPaymentInfo(docData);
+    const summary = {
+      ...docData, ...paymentInfo, scheduleID: schedule.id,
+      subscriptionID: schedule.subscription as string,
+      created: Timestamp.fromMillis(schedule.created * 1000),
+    };
+
     const emailDoc = await sendConfirmationEmail(summary);
-    const donationInfo: DonationInfo = {
+    const donationInfo: DonationSubscriptionInfo = {
       subscriptionID: summary.subscriptionID,
       application: db.donationApplication.doc(data.applicationID),
-      created: Timestamp.fromDate(new Date(schedule.created * 1000)),
+      created: summary.created,
       confirmationEmail: emailDoc,
-      customerID: docData.customerID,
-      scheduleID: schedule.id,
+      customerID: summary.customerID,
+      scheduleID: summary.scheduleID,
     };
     await db.subscriptions.doc(donationInfo.subscriptionID).set(donationInfo);
+
     return {
       ...summary,
       startDate: summary.startDate.getTime(),

@@ -13,7 +13,7 @@ const donationLengths = [
 ];
 
 const minimumAmount = 30;
-const presetAmounts = [30, 60, 90];
+const presetAmounts = [30, 40, 50];
 const targetAmount = 30;
 
 export const SETTINGS = {

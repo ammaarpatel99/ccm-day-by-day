@@ -3,7 +3,10 @@ import {
   getFirestore,
   FirestoreDataConverter,
 } from "firebase-admin/firestore";
-import {DonationInfo, DonationProcessingInfo} from "./helpers";
+import {
+  DonationSubscriptionInfo,
+  DonationApplicationWithCustomerID,
+} from "./helpers";
 
 
 interface Email {
@@ -18,28 +21,31 @@ const app = initializeApp();
 const firestore = getFirestore(app);
 
 const donationApplicationConverter
-  : FirestoreDataConverter<DonationProcessingInfo> = {
-    toFirestore(modelObject: DonationProcessingInfo)
+  : FirestoreDataConverter<DonationApplicationWithCustomerID> = {
+    toFirestore(modelObject: DonationApplicationWithCustomerID)
       : FirebaseFirestore.DocumentData {
       return modelObject;
     },
     fromFirestore(
       snapshot: FirebaseFirestore.QueryDocumentSnapshot
-    ): DonationProcessingInfo {
-      return snapshot.data() as DonationProcessingInfo;
+    ): DonationApplicationWithCustomerID {
+      return snapshot.data() as DonationApplicationWithCustomerID;
     },
   };
 
-const subscriptionConverter: FirestoreDataConverter<DonationInfo> = {
-  toFirestore(modelObject: DonationInfo): FirebaseFirestore.DocumentData {
-    return modelObject;
-  },
-  fromFirestore(
-    snapshot: FirebaseFirestore.QueryDocumentSnapshot
-  ): DonationInfo {
-    return snapshot.data() as DonationInfo;
-  },
-};
+const subscriptionConverter
+  : FirestoreDataConverter<DonationSubscriptionInfo> = {
+    toFirestore(
+      modelObject: DonationSubscriptionInfo
+    ): FirebaseFirestore.DocumentData {
+      return modelObject;
+    },
+    fromFirestore(
+      snapshot: FirebaseFirestore.QueryDocumentSnapshot
+    ): DonationSubscriptionInfo {
+      return snapshot.data() as DonationSubscriptionInfo;
+    },
+  };
 
 const mailConverter: FirestoreDataConverter<Email> = {
   toFirestore(modelObject: Email): FirebaseFirestore.DocumentData {
