@@ -5,7 +5,9 @@ import {
   DonationSummary,
 } from "./helpers";
 
-export {DonationLength} from "./helpers";
+export enum APIEndpoints {
+  CONFIG = "config"
+}
 
 export type ConfigReq = void;
 export type ConfigRes = typeof SETTINGS;
@@ -24,3 +26,4 @@ export type SetDefaultPaymentRes = void;
 
 export type SetupSubscriptionReq = {applicationID: string};
 export type SetupSubscriptionRes = DonationSummary;
+export {DonationLength} from "./donationLength";

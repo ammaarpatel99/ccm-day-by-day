@@ -1,11 +1,6 @@
 import {SETTINGS} from "./settings";
 import {DocumentReference, Timestamp} from "firebase-admin/lib/firestore";
-
-export enum DonationLength {
-  FULL_RAMADAN,
-  REMAINING_DAYS,
-  LAST_10_DAYS,
-}
+import {DonationLength} from "./donationLength";
 
 export enum DonationScheme {
   FULL,
