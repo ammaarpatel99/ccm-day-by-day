@@ -1,27 +1,62 @@
 import Stripe from "stripe";
-import {BaseSubscription} from "./database";
-import {SETTINGS} from "./settings";
+import {
+  DonationChoice,
+  DonationProcessingInfo,
+  DonationScheme, DonorInfo,
+  processPaymentInfo,
+} from "./helpers";
 
 // TODO: change stripe key to the live one
+// FIXME: roll stripe test key
 const stripeKey = "sk_test_51MOiitFg1jrvwujseQk1ciZYu1dmlmaamxe" +
   "7kaW1jDsYwp59HtyBqKw6JsAxUEHVswfPvaI6XVpgVUYCC11kfVme00KC97UJxx";
 const stripe = new Stripe(stripeKey, {apiVersion: "2022-11-15"});
 
-enum Products {
+enum Product {
   FULL_SCHEME = "prod_NOPdvEJI9cTqO4",
   PARTIAL_SCHEME = "prod_NOPfwfyWvxemAO",
   LAST_10_DAYS = "prod_NOPgvVnUse2LbEprod_NOPgvVnUse2LbE",
-  ONE_OFF = "prod_NOPgvVnUse2LbE"
+}
+
+interface PaymentInfo {
+  product: Product,
+  iterations: number,
+  startDate: Date
 }
 
 /**
+ * @param {DonationScheme} donationScheme
+ * @return {Product}
+ */
+function donationSchemeToProduct(donationScheme: DonationScheme) {
+  switch (donationScheme) {
+  case DonationScheme.FULL:
+    return Product.FULL_SCHEME;
+  case DonationScheme.PARTIAL:
+    return Product.PARTIAL_SCHEME;
+  case DonationScheme.LAST_10_DAYS:
+    return Product.LAST_10_DAYS;
+  }
+}
+
+/**
+ * @param {DonationChoice} data
+ * @return {PaymentInfo}
+ */
+function producePaymentInfo(data: DonationChoice): PaymentInfo {
+  const info = processPaymentInfo(data);
+  return {
+    ...info,
+    product: donationSchemeToProduct(info.donationScheme),
+  };
+}
+
+
+/**
  * Make a customer on Stripe
- * @param {string} email
- * @param {string} name
- * @param {string} phone
  * @return {string} The customer ID
  */
-export async function makeCustomer(email: string, name: string, phone: string) {
+export async function makeCustomer({email, name, phone}: DonorInfo) {
   const customer = await stripe.customers.create({email, name, phone});
   return customer.id;
 }
@@ -37,6 +72,7 @@ export async function makeCustomer(email: string, name: string, phone: string) {
  */
 export async function createSetupSession(email: string, successURL: string) {
   const session = await stripe.checkout.sessions.create({
+    // TODO: review payment method types accepted
     payment_method_types: ["card", "bacs_debit", "sepa_debit"],
     mode: "setup",
     success_url: `${successURL}/{CHECKOUT_SESSION_ID}`,
@@ -62,33 +98,29 @@ export async function setDefaultPaymentMethod(customerID: string) {
 
 /**
  * Creates a subscription schedule that charges daily.
- * @param {BaseSubscription} data
- * @param {string} firestoreDocID
+ * @param {DonationProcessingInfo} data
+ * @param {string} applicationID
  */
 export async function createSubscriptionSchedule(
-  data: BaseSubscription, firestoreDocID: string,
+  data: DonationProcessingInfo, applicationID: string,
 ) {
-  const startDate = Math.floor(data.startDate.toDate().getTime() / 1000);
-  const last10Days =
-    data.startDate.toDate().getTime() == SETTINGS.last10Days.getTime();
-  const product = data.eligibleForBrick ? Products.FULL_SCHEME :
-    last10Days ? Products.LAST_10_DAYS : Products.PARTIAL_SCHEME;
+  const paymentInfo = producePaymentInfo(data);
   return await stripe.subscriptionSchedules.create({
     customer: data.customerID,
-    start_date: startDate,
+    start_date: Math.floor(paymentInfo.startDate.getTime() / 1000),
     end_behavior: "cancel",
     phases: [
       {
         items: [{
           price_data: {
-            product,
+            product: paymentInfo.product,
             currency: "gbp",
             recurring: {interval: "day"},
             tax_behavior: "inclusive",
             unit_amount: data.amount * 100,
           },
         }],
-        iterations: data.iterations,
+        iterations: paymentInfo.iterations,
       },
     ],
     metadata: {
@@ -96,7 +128,7 @@ export async function createSubscriptionSchedule(
       anonymous: JSON.stringify(data.anonymous),
       giftAid: JSON.stringify(data.giftAid),
       wantsBrick: JSON.stringify(data.wantsBrick),
-      firestoreDocID,
+      firestoreDocID: applicationID,
     },
   });
 }

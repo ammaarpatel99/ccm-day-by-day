@@ -1,21 +1,23 @@
-export interface StripeSetupData {
-  successURL: string;
-  amount: number;
-  email: string;
-  phone: string;
-  name: string;
-  wantsBrick: boolean;
-  anonymous: boolean;
-  giftAid: boolean;
-  startDate: number;
-  iterations: number;
-}
+import {SETTINGS} from "./settings";
+import {
+  DonationApplication,
+  DonationCheckoutSummary,
+  DonationSummary,
+} from "./helpers";
 
-export interface StripeSetupRes {
-  sessionURL: string;
-}
+export {DonationLength} from "./helpers";
 
-export interface StripeSubData {
-  sessionID: string;
-  docID: string;
-}
+export type ConfigReq = void;
+export type ConfigRes = typeof SETTINGS;
+
+export type SetupPaymentReq = DonationApplication & { successURL: string };
+export type SetupPaymentRes = { setupURL: string };
+
+export type CheckoutSummaryReq = { applicationID: string };
+export type CheckoutSummaryRes = DonationCheckoutSummary;
+
+export type SetDefaultPaymentReq = {applicationID: string};
+export type SetDefaultPaymentRes = void;
+
+export type SetupSubscriptionReq = {applicationID: string};
+export type SetupSubscriptionRes = DonationSummary;

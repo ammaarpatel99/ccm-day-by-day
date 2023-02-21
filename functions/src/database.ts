@@ -1,33 +1,10 @@
 import {initializeApp} from "firebase-admin/app";
 import {
   getFirestore,
-  Timestamp,
-  DocumentReference,
   FirestoreDataConverter,
 } from "firebase-admin/firestore";
+import {DonationInfo, DonationProcessingInfo} from "./helpers";
 
-export interface BaseSubscription {
-  name: string;
-  wantsBrick: boolean;
-  eligibleForBrick: boolean;
-  anonymous: boolean;
-  email: string;
-  phone: string;
-  giftAid: boolean;
-  amount: number;
-  iterations: number;
-  startDate: Timestamp;
-  customerID: string;
-}
-
-export interface ActiveSubscription extends BaseSubscription {
-  scheduleID: string;
-  subscriptionID: string;
-  created: Timestamp;
-  confirmationEmail: DocumentReference;
-}
-
-type Subscription = BaseSubscription | ActiveSubscription;
 
 interface Email {
   to: string;
@@ -40,14 +17,27 @@ interface Email {
 const app = initializeApp();
 const firestore = getFirestore(app);
 
-const subscriptionConverter: FirestoreDataConverter<Subscription> = {
-  toFirestore(modelObject: Subscription): FirebaseFirestore.DocumentData {
+const donationApplicationConverter
+  : FirestoreDataConverter<DonationProcessingInfo> = {
+    toFirestore(modelObject: DonationProcessingInfo)
+      : FirebaseFirestore.DocumentData {
+      return modelObject;
+    },
+    fromFirestore(
+      snapshot: FirebaseFirestore.QueryDocumentSnapshot
+    ): DonationProcessingInfo {
+      return snapshot.data() as DonationProcessingInfo;
+    },
+  };
+
+const subscriptionConverter: FirestoreDataConverter<DonationInfo> = {
+  toFirestore(modelObject: DonationInfo): FirebaseFirestore.DocumentData {
     return modelObject;
   },
   fromFirestore(
     snapshot: FirebaseFirestore.QueryDocumentSnapshot
-  ): Subscription {
-    return snapshot.data() as Subscription;
+  ): DonationInfo {
+    return snapshot.data() as DonationInfo;
   },
 };
 
@@ -63,6 +53,8 @@ const mailConverter: FirestoreDataConverter<Email> = {
 };
 
 export const db = {
+  donationApplication: firestore.collection("donationApplications")
+    .withConverter(donationApplicationConverter),
   subscriptions: firestore.collection("subscriptions")
     .withConverter(subscriptionConverter),
   mail: firestore.collection("mail")
