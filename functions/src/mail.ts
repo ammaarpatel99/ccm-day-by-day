@@ -23,17 +23,17 @@ export async function sendConfirmationEmail(data: DonationSummary) {
       data.eligibleForBrick ?
         "\nWant to be gifted a brick if eligible: " +
         data.wantsBrick ? "Yes" : "No" : "" +
-        "\n\nName: " + data.name +
-        "\nAnonymous: " + data.anonymous ? "Yes" : "No" +
-        "\n\nEmail: " + data.email +
-        "\nPhone Number: " + data.phone +
-        "\nGift Aid: " + data.giftAid ? "Yes" : "No" +
-          "\n\n\nBest wishes," +
-          "\nAdmin Team" +
-          "\n<a href='cambridgecentralmosque.org'>" +
-          "Cambridge Central Mosque</a>" +
-          "\n<a href='mailto:daybyday@cambridgecentralmosque.org'>" +
-          "daybyday@cambridgecentralmosque.org</a>",
+      "\n\nName: " + data.name +
+      "\nAnonymous: " + data.anonymous ? "Yes" : "No" +
+      "\n\nEmail: " + data.email +
+      "\nPhone Number: " + data.phone +
+      "\nGift Aid: " + data.giftAid ? "Yes" : "No" +
+      "\n\n\nBest wishes," +
+      "\nAdmin Team" +
+      "\n<a href='cambridgecentralmosque.org'>" +
+      "Cambridge Central Mosque</a>" +
+      "\n<a href='mailto:daybyday@cambridgecentralmosque.org'>" +
+      "daybyday@cambridgecentralmosque.org</a>",
     },
   });
 }

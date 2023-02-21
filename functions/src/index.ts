@@ -10,7 +10,7 @@ import {sendConfirmationEmail} from "./mail";
 import {
   CheckoutSummaryReq,
   CheckoutSummaryRes,
-  ConfigRes,
+  ConfigRes, PreCheckoutSummaryReq, PreCheckoutSummaryRes,
   SetDefaultPaymentReq,
   SetDefaultPaymentRes,
   SetupPaymentReq,
@@ -35,6 +35,12 @@ export const setupPayment = functions.https.onCall(
       data.email, `${data.successURL}/${applicationID}`
     );
     return {setupURL};
+  }
+);
+
+export const preCheckoutSummary = functions.https.onCall(
+  async (data: PreCheckoutSummaryReq): Promise<PreCheckoutSummaryRes> => {
+    return produceDonationSummary(data);
   }
 );
 

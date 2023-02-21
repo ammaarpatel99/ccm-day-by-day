@@ -13,6 +13,9 @@ export type ConfigRes = typeof SETTINGS;
 export type SetupPaymentReq = DonationApplication & { successURL: string };
 export type SetupPaymentRes = { setupURL: string };
 
+export type PreCheckoutSummaryReq = DonationApplication;
+export type PreCheckoutSummaryRes = DonationCheckoutSummary;
+
 export type CheckoutSummaryReq = { applicationID: string };
 export type CheckoutSummaryRes = DonationCheckoutSummary;
 
