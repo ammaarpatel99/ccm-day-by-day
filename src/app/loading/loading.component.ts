@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ConfigService} from "../services/config.service";
 import {Router} from "@angular/router";
+import {DonationApplicationService} from "../services/donation-application.service";
 
 @Component({
   selector: 'app-loading',
@@ -9,12 +10,12 @@ import {Router} from "@angular/router";
 })
 export class LoadingComponent implements OnInit {
   constructor(
-    private readonly configService: ConfigService,
+    private readonly donationApplicationService: DonationApplicationService,
     private readonly router: Router
   ) { }
 
   ngOnInit(): void {
-    this.configService.config$.subscribe(() => {
+    this.donationApplicationService.setupWithConfig().subscribe(() => {
       this.router.navigate(['/', 'setup']);
     });
   }

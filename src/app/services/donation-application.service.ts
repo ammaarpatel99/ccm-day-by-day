@@ -2,12 +2,12 @@ import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {DonationLength} from "../../../functions/src/api-types";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfigService} from "./config.service";
-import {AsyncSubject, switchMap, takeUntil, tap} from "rxjs";
+import {AsyncSubject, shareReplay, startWith, switchMap, takeUntil, tap} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
-export class DonationApplicationService implements OnInit, OnDestroy {
+export class DonationApplicationService implements OnDestroy {
   private readonly destroyed = new AsyncSubject()
 
   private _showDonationLengths: false | DonationLength[] = false;
@@ -21,7 +21,7 @@ export class DonationApplicationService implements OnInit, OnDestroy {
   private _eligibleForBrick = false
   get eligibleForBrick() {return this._eligibleForBrick}
   readonly donorInfo = new FormGroup({
-    name: new FormControl("", [Validators.required, Validators.minLength(25)]),
+    name: new FormControl("", [Validators.required, Validators.minLength(2), Validators.maxLength(25)]),
     anonymous: new FormControl(false, Validators.required),
     wantsBrick: new FormControl(true, Validators.required)
   })
@@ -37,13 +37,11 @@ export class DonationApplicationService implements OnInit, OnDestroy {
 
   constructor(
     private readonly configService: ConfigService
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.setupWithConfig().subscribe()
   }
 
-  private setupWithConfig() {
+  setupWithConfig() {
     return this.configService.config$.pipe(
       tap(data => {
         this.setupDonationLengths(data.donationLengths)
@@ -51,6 +49,7 @@ export class DonationApplicationService implements OnInit, OnDestroy {
         this.setupAmounts(data.presetAmounts, data.minimumAmount, data.targetAmount)
       }),
       switchMap(data => this.setupEligibleForBrick(data.targetAmount)),
+      shareReplay(1),
       takeUntil(this.destroyed)
     )
   }
@@ -86,6 +85,7 @@ export class DonationApplicationService implements OnInit, OnDestroy {
 
   private setupEligibleForBrick(targetAmount: number) {
     return this.donationAmount.valueChanges.pipe(
+      startWith(0),
       tap(amount => {
         this._eligibleForBrick = !!amount && amount >= targetAmount
       })

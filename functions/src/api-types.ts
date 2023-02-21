@@ -1,8 +1,8 @@
 import {SETTINGS} from "./settings";
 import {
   DonationApplication,
-  DonationCheckoutSummary,
-  DonationSummary,
+  DonationCheckoutSummaryPayload,
+  DonationSummaryPayload,
 } from "./helpers";
 
 export enum APIEndpoints {
@@ -21,14 +21,14 @@ export type SetupPaymentReq = DonationApplication & { successURL: string };
 export type SetupPaymentRes = { setupURL: string };
 
 export type PreCheckoutSummaryReq = DonationApplication;
-export type PreCheckoutSummaryRes = DonationCheckoutSummary;
+export type PreCheckoutSummaryRes = DonationCheckoutSummaryPayload;
 
 export type CheckoutSummaryReq = { applicationID: string };
-export type CheckoutSummaryRes = DonationCheckoutSummary;
+export type CheckoutSummaryRes = DonationCheckoutSummaryPayload;
 
 export type SetDefaultPaymentReq = {applicationID: string};
 export type SetDefaultPaymentRes = void;
 
 export type SetupSubscriptionReq = {applicationID: string};
-export type SetupSubscriptionRes = DonationSummary;
+export type SetupSubscriptionRes = DonationSummaryPayload;
 export {DonationLength} from "./donationLength";

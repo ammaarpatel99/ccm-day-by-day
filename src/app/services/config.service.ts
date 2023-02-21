@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {Functions, httpsCallable} from "@angular/fire/functions";
 import {APIEndpoints, ConfigReq, ConfigRes} from "../../../functions/src/api-types";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
-import {map, shareReplay} from "rxjs";
+import {map, shareReplay, tap} from "rxjs";
 
 @Injectable({
   providedIn: 'root'

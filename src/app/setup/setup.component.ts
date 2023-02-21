@@ -1,18 +1,21 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {MatStepper} from "@angular/material/stepper";
 import {DonationApplicationService} from "../services/donation-application.service";
 import {CheckoutState, SetupService} from "../services/setup.service";
 import {DonationLength} from "../../../functions/src/api-types";
 import {ConfigService} from "../services/config.service";
 import {map, switchMap} from "rxjs";
-import {DonationCheckoutSummary, DonationSummary} from "../../../functions/src/helpers";
+import {
+  DonationCheckoutSummaryPayload,
+  DonationSummaryPayload
+} from "../../../functions/src/helpers";
 
 @Component({
   selector: 'app-setup',
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.scss']
 })
-export class SetupComponent implements OnInit {
+export class SetupComponent implements OnInit, AfterViewInit {
   @ViewChild('stepper') private stepper!: MatStepper;
   get showDonationLengths() {
     return this.applicationService.showDonationLengths
@@ -56,12 +59,12 @@ export class SetupComponent implements OnInit {
     )
   }
 
-  private _checkoutSummary: DonationCheckoutSummary | null = null;
+  private _checkoutSummary: DonationCheckoutSummaryPayload | null = null;
   get checkoutSummary() {
     return this._checkoutSummary
   }
 
-  private _fullSummary: DonationSummary | null = null;
+  private _fullSummary: DonationSummaryPayload | null = null;
   get fullSummary() {
     return this._fullSummary
   }
@@ -140,15 +143,19 @@ export class SetupComponent implements OnInit {
     location.replace("https://cambridgecentralmosque.org/daybyday")
   }
 
+  numberToDate(n: number) {
+    return new Date(n)
+  }
+
   constructor(
     private readonly applicationService: DonationApplicationService,
     private readonly setupService: SetupService,
     private readonly configService: ConfigService
-  ) { }
+  ) {
+  }
 
   ngOnInit(): void {
     if (this.checkoutState === CheckoutState.RE_ESTABLISHING) {
-      while (this.stepper.selectedIndex < 3) this.stepper.next()
       this._checkoutLoadingState = {show: true, mode: "indeterminate", value: 0}
       this.setupService.getCheckoutSummary().pipe(
         map(data => {
@@ -169,5 +176,11 @@ export class SetupComponent implements OnInit {
         })
       ).subscribe()
     }
+  }
+
+  ngAfterViewInit(): void {
+    // if (this.checkoutState === CheckoutState.RE_ESTABLISHING) {
+    //   while (this.stepper.selectedIndex < 3) this.stepper.next()
+    // }
   }
 }

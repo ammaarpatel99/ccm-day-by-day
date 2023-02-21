@@ -30,7 +30,7 @@ export enum CheckoutState {
   providedIn: 'root'
 })
 export class SetupService {
-  private readonly successURL = `${location.origin}/payment-setup`;
+  private readonly successURL = `${location.origin}/paymentsetup`;
   private _checkoutState: CheckoutState = CheckoutState.NOT_BEGUN;
   get checkoutState() { return this._checkoutState }
   private checkoutData = {applicationID: '', checkoutID: ''}
@@ -116,6 +116,7 @@ export class SetupService {
   completePaymentSetup(applicationID: string, checkoutID: string) {
     this._checkoutState = CheckoutState.RE_ESTABLISHING
     this.checkoutData = {applicationID, checkoutID}
+    console.log(this.checkoutData)
   }
 
   constructor(

@@ -63,6 +63,18 @@ export interface DonationSummary extends
   DonationCheckoutSummary,
   Omit<DonationInfo, "confirmationEmail"|"application"> {}
 
+export interface DonationCheckoutSummaryPayload extends
+  Omit<DonationApplication, "donationLength">,
+  Omit<ProcessedDonationInfo, "donationScheme" | "startDate"> {
+  startDate: number
+}
+
+export interface DonationSummaryPayload extends
+  DonationCheckoutSummaryPayload,
+  Omit<DonationInfo, "confirmationEmail"|"application"|"created"> {
+  created: number
+}
+
 
 /**
  * The difference between 2 dates in days.

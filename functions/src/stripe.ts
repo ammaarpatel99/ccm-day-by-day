@@ -65,19 +65,20 @@ export async function makeCustomer({email, name, phone}: DonorInfo) {
  * creates a Stripe session which creates a customer
  * and sets up their payment method.
  * It does not make it the default method.
- * @param {string} email The customer's emails
+ * @param {string} customerID The customer's emails
  * @param {string} successURL The url to redirect to
  * "/SESSION_ID" will be added to the end of the url.
  * @return {string} url to redirect user to for payment setup
  */
-export async function createSetupSession(email: string, successURL: string) {
+export async function createSetupSession(
+  customerID: string, successURL: string
+) {
   const session = await stripe.checkout.sessions.create({
     // TODO: review payment method types accepted
     payment_method_types: ["card", "bacs_debit", "sepa_debit"],
     mode: "setup",
     success_url: `${successURL}/{CHECKOUT_SESSION_ID}`,
-    customer_creation: "always",
-    customer_email: email,
+    customer: customerID,
   });
   return session.url as string;
 }

@@ -32,7 +32,7 @@ export const setupPayment = functions.https.onCall(
     const doc = await db.donationApplication.add({..._data, customerID});
     const applicationID = doc.id;
     const setupURL = await createSetupSession(
-      data.email, `${data.successURL}/${applicationID}`
+      customerID, `${data.successURL}/${applicationID}`
     );
     return {setupURL};
   }
@@ -40,7 +40,8 @@ export const setupPayment = functions.https.onCall(
 
 export const preCheckoutSummary = functions.https.onCall(
   async (data: PreCheckoutSummaryReq): Promise<PreCheckoutSummaryRes> => {
-    return produceDonationSummary(data);
+    const _data = produceDonationSummary(data);
+    return {..._data, startDate: _data.startDate.getTime()};
   }
 );
 
@@ -49,7 +50,8 @@ export const checkoutSummary = functions.https.onCall(
     const doc = await db.donationApplication.doc(data.applicationID).get();
     const docData = doc.data();
     if (!docData) throw new Error("Application doesn't exist");
-    return produceDonationSummary(docData);
+    const _data = produceDonationSummary(docData);
+    return {..._data, startDate: _data.startDate.getTime()};
   }
 );
 
@@ -81,6 +83,10 @@ export const setupSubscription = functions.https.onCall(
       scheduleID: schedule.id,
     };
     await db.subscriptions.doc(donationInfo.subscriptionID).set(donationInfo);
-    return summary;
+    return {
+      ...summary,
+      startDate: summary.startDate.getTime(),
+      created: summary.created.toMillis(),
+    };
   }
 );

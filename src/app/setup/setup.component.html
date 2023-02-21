@@ -21,7 +21,7 @@
           mat-raised-button color="primary"
           *ngFor="let presetAmount of (showPresetAmounts || [])"
           (click)="setAmount(presetAmount)"
-        >{{presetAmount | currency:"GBP"}}</button>
+        >{{presetAmount | currency:"GBP"}} / day</button>
       </div>
       <mat-divider></mat-divider>
     </ng-container>
@@ -34,7 +34,7 @@
     </div>
     <div class="actions-container">
       <button mat-stroked-button matStepperPrevious>BACK</button>
-      <button mat-stroked-button color="primary" matStepperNext>NEXT</button>
+      <button mat-stroked-button color="primary" matStepperNext [disabled]="!donationAmountComplete">NEXT</button>
     </div>
   </mat-step>
 
@@ -94,7 +94,7 @@
     <mat-slide-toggle [formControl]="consent.controls.disclaimer" color="primary">I accept the disclaimer</mat-slide-toggle>
     <div class="actions-container">
       <button mat-stroked-button matStepperPrevious>BACK</button>
-      <button mat-stroked-button color="primary" matStepperNext>NEXT</button>
+      <button mat-stroked-button color="primary" matStepperNext [disabled]="!donationDetailsComplete">NEXT</button>
     </div>
   </mat-step>
 
@@ -111,8 +111,8 @@
     <ng-container *ngIf="checkoutSummary != null">
       <h2>Summary:</h2>
       <p>Daily Amount: {{checkoutSummary.amount | currency:"GBP"}}</p>
-      <p>Start Date: {{checkoutSummary.startDate | date:"dd/MM/yyyy"}}</p>
-      <p>Duration: {{checkoutSummary.iterations}}</p>
+      <p>Start Date: {{numberToDate(checkoutSummary.startDate) | date:"dd/MM/yyyy"}}</p>
+      <p>Duration: {{checkoutSummary.iterations}} days</p>
       <br/>
       <p>Name: {{checkoutSummary.name}}</p>
       <p>Anonymous: {{checkoutSummary.anonymous}}</p>
@@ -137,24 +137,29 @@
   </mat-step>
 
   <mat-step [editable]="!canEdit">
+    <ng-template matStepLabel>Complete</ng-template>
     <h2>
       Your Day By Day donation has been setup!<br/>
       You should have received a confirmation email confirming the details.
     </h2>
-    <h3>Summary:</h3>
-    <p>ID: {{fullSummary!.subscriptionID}}</p>
-    <br/>
-    <p>Daily Amount: {{fullSummary!.amount | currency:"GBP"}}</p>
-    <p>Start Date: {{fullSummary!.startDate | date:"dd/MM/yyyy"}}</p>
-    <p>Duration: {{fullSummary!.iterations}}</p>
-    <br/>
-    <p>Name: {{fullSummary!.name}}</p>
-    <p>Anonymous: {{fullSummary!.anonymous}}</p>
-    <p *ngIf="fullSummary!.eligibleForBrick">Receive Framed Brick if Eligible: {{fullSummary!.wantsBrick}}</p>
-    <br/>
-    <p>Email: {{fullSummary!.email}}</p>
-    <p>Phone Number: {{fullSummary!.phone}}</p>
-    <p>Gift Aid: {{fullSummary!.giftAid ? "Yes" : "No"}}</p>
+    <ng-container *ngIf="fullSummary !== null">
+      <h3>Summary:</h3>
+      <p>ID: {{fullSummary.subscriptionID}}</p>
+      <p>Created: {{numberToDate(fullSummary.created) | date:"dd/MM/yyyy"}}</p>
+      <br/>
+      <p>Daily Amount: {{fullSummary.amount | currency:"GBP"}}</p>
+      <p>Start Date: {{numberToDate(fullSummary.startDate) | date:"dd/MM/yyyy"}}</p>
+      <p>Duration: {{fullSummary.iterations}} days</p>
+      <br/>
+      <p>Name: {{fullSummary.name}}</p>
+      <p>Anonymous: {{fullSummary.anonymous}}</p>
+      <p *ngIf="fullSummary.eligibleForBrick">Receive Framed Brick if Eligible: {{fullSummary.wantsBrick}}</p>
+      <br/>
+      <p>Email: {{fullSummary.email}}</p>
+      <p>Phone Number: {{fullSummary.phone}}</p>
+      <p>Gift Aid: {{fullSummary.giftAid ? "Yes" : "No"}}</p>
+    </ng-container>
+
     <button mat-stroked-button color="primary" (click)="goToMainSite()">Return to Main Website</button>
   </mat-step>
 </mat-stepper>

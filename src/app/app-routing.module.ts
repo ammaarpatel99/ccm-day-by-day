@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import {SetupComponent} from "./setup/setup.component";
 import {LoadingComponent} from "./loading/loading.component";
+import {PaymentSetupComponent} from "./payment-setup/payment-setup.component";
 
 const routes: Routes = [
   {
@@ -9,7 +10,8 @@ const routes: Routes = [
     component: SetupComponent
   },
   {
-    path: 'payment-setup/:applicationID/:checkoutID'
+    path: 'paymentsetup/:applicationID/:checkoutID',
+    component: PaymentSetupComponent
   },
   {
     path: '',
