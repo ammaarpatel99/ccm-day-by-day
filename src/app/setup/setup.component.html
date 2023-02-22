@@ -8,8 +8,8 @@
     </p>
     <button
       mat-raised-button color="primary"
-      *ngFor="let donationLength of (showDonationLengths || []); let first = first"
-      (click)="selectDonationLength(donationLength)" [class.first-button]="first"
+      *ngFor="let donationLength of (showDonationLengths || []); first as isFirst"
+      (click)="selectDonationLength(donationLength)" [class.firstBtn]="isFirst"
     >{{getDonationLengthText(donationLength)}}</button>
   </mat-step>
 
@@ -41,20 +41,6 @@
 
   <mat-step [editable]="canEdit" [completed]="!canEdit || donationDetailsComplete">
     <ng-template matStepLabel>Details</ng-template>
-    <h2>Donate on behalf of:</h2>
-    <h3>(Can be yourself or someone else)</h3>
-    <p>
-      If you are gifted a framed brick, this name will be on the plaque.
-      If you are listed on the digital wall of donors, this name will be on the wall.<br/>
-      Max 25 characters.
-    </p>
-    <mat-form-field>
-      <mat-label>Name:</mat-label>
-      <input matInput [formControl]="donorInfo.controls.onBehalfOf" placeholder="Donate on behalf of:">
-      <mat-error *ngIf="donorInfo.controls.onBehalfOf.invalid">{{errorMessage(donorInfo.controls.onBehalfOf)}}</mat-error>
-    </mat-form-field>
-    <p>If you do not wish the donation to be noted on our website and other media, please check the anonymous option.</p>
-    <mat-slide-toggle color="primary" [formControl]="donorInfo.controls.anonymous">Anonymous</mat-slide-toggle>
     <h2>Contact Details:</h2>
     <mat-form-field>
       <mat-label>Name</mat-label>
@@ -76,6 +62,20 @@
       <input matInput placeholder="309-313 Mill Rd, Cambridge, CB1 3DF, UK" [formControl]="contactInfo.controls.address">
       <mat-error *ngIf="contactInfo.controls.address.invalid">{{errorMessage(contactInfo.controls.address)}}</mat-error>
     </mat-form-field>
+    <h2>Donate on behalf of:</h2>
+    <h3>(Can be yourself or someone else)</h3>
+    <p>
+      If you are gifted a framed brick, this name will be on the plaque.
+      If you are listed on the digital wall of donors, this name will be on the wall.<br/>
+      Max 25 characters.
+    </p>
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput [formControl]="donorInfo.controls.onBehalfOf" placeholder="Donate on behalf of:">
+      <mat-error *ngIf="donorInfo.controls.onBehalfOf.invalid">{{errorMessage(donorInfo.controls.onBehalfOf)}}</mat-error>
+    </mat-form-field>
+    <p>If you do not wish the donation to be noted on our website and other media, please check the anonymous option.</p>
+    <mat-slide-toggle color="primary" [formControl]="donorInfo.controls.anonymous">Anonymous</mat-slide-toggle>
     <h2>Consent</h2>
     <p>
       If you are a UK taxpayer and are eligible for Gift Aid, you may select the below option.
@@ -100,7 +100,7 @@
     </div>
   </mat-step>
 
-  <mat-step [editable]="checkoutState !== checkoutStates.COMPLETE" [completed]="checkoutState === checkoutStates.COMPLETE">
+  <mat-step [editable]="checkoutState !== checkoutStates.COMPLETE" [completed]="checkoutState === checkoutStates.COMPLETE" #checkoutStep>
     <ng-template matStepLabel>Setup Your Donation</ng-template>
     <div class="loading-container">
       <mat-progress-bar

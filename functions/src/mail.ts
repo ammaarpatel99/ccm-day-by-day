@@ -39,8 +39,8 @@ export async function sendConfirmationEmail(
   // TODO: add Gift Aid form
   return await transporter.sendMail({
     to: data.email,
-    subject: "CCM Day By Day 2023 Configured",
-    html: "Thank you for setting up your donation to Cambridge Central" +
+    subject: "CCM Day By Day 2023",
+    text: "Thank you for setting up your donation to Cambridge Central" +
     " Mosque for Ramadan 2023 through our Day By Day scheme." +
     brickTxt +
     " The details of your donation are below:" +

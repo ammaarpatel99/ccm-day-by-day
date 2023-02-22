@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
-import {MatStepper} from "@angular/material/stepper";
+import {MatStep, MatStepper} from "@angular/material/stepper";
 import {DonationApplicationService} from "../services/donation-application.service";
 import {CheckoutState, SetupService} from "../services/setup.service";
 import {DonationLength} from "../../../functions/src/api-types";
@@ -18,6 +18,7 @@ import {FormControl} from "@angular/forms";
 })
 export class SetupComponent implements OnInit, AfterViewInit {
   @ViewChild('stepper') private stepper!: MatStepper;
+  @ViewChild('checkoutStep') private checkoutStep!: MatStep;
   get showDonationLengths() {
     return this.applicationService.showDonationLengths
   }
@@ -108,7 +109,7 @@ export class SetupComponent implements OnInit, AfterViewInit {
   }
 
   stepperSelectionChange(index: number) {
-    if (index === 3) {
+    if (this.showDonationLengths === false ? index === 2 : index === 3) {
       this._checkoutSummary = null
       this._checkoutLoadingState = {show: true, mode: 'query', value: 0}
       this.setupService.getPreCheckoutSummary().subscribe(data => {
@@ -134,7 +135,7 @@ export class SetupComponent implements OnInit, AfterViewInit {
   errorMessage(control: FormControl) {
     const errors = Object.entries(control.errors || {})
     if (errors.length === 0) return "";
-    else return errors[0][1];
+    return errors[0][1];
   }
 
   constructor(
@@ -170,7 +171,7 @@ export class SetupComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.checkoutState === CheckoutState.RE_ESTABLISHING) {
-      this.stepper.steps.get(3)?.select()
+      this.checkoutStep.select()
     }
   }
 }

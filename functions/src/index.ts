@@ -18,6 +18,7 @@ import {configuration} from "./settings";
 import {processSubscriptionInfo} from "./processSubscriptionInfo";
 import {ApplicationWithCustomer, Subscription} from "./helpers";
 import {generateIDs} from "./counter";
+import {sendConfirmationEmail} from "./mail";
 
 export const config = functions.https.onCall((): ConfigRes => {
   return configuration();
@@ -92,7 +93,11 @@ export const setupSubscription = functions.https.onCall(
       created: schedule.created * 1000, emailSent: false,
     };
     await doc.set(subscription);
-    // TODO: send email and update doc again
+    await sendConfirmationEmail(
+      {...subscription, ...paymentInfo}, data.donationID
+    );
+    subscription.emailSent = true;
+    await doc.set(subscription);
     return {...subscription, ...paymentInfo};
   }
 );

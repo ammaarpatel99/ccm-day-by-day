@@ -7,7 +7,7 @@ export {DonationLength} from "./helpers";
 export enum APIEndpoints {
   CONFIG = "config",
   APPLICATION_SUMMARY = "applicationSummary",
-  GET_APPLICATION = "checkoutSummary",
+  GET_APPLICATION = "getApplication",
   SETUP_PAYMENT = "setupPayment",
   SET_DEFAULT_PAYMENT_METHOD = "setDefaultPayment",
   SETUP_SUBSCRIPTION = "setupSubscription"

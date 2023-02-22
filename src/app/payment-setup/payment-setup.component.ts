@@ -19,7 +19,7 @@ export class PaymentSetupComponent implements OnInit {
       const applicationID = params.get('applicationID') as string;
       const checkoutID = params.get('checkoutID') as string;
       this.setupService.completePaymentSetup(applicationID, checkoutID)
-      setTimeout(() => this.router.navigate(['/', 'setup']))
+      this.router.navigate(['/', 'setup'])
     })
   }
 
