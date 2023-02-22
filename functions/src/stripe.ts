@@ -1,64 +1,27 @@
 import Stripe from "stripe";
 import {
-  DonationChoice,
-  DonationApplicationWithCustomerID,
-  DonationScheme,
-  DonorInfo,
-  processPaymentInfo,
+  Application,
+  ApplicationWithCustomer,
+
 } from "./helpers";
+import {processSubscriptionInfo} from "./processSubscriptionInfo";
 
 // TODO: change stripe key to the live one
 // FIXME: roll stripe test key
+// TODO: add product ID
 const stripeKey = "sk_test_51MOiitFg1jrvwujseQk1ciZYu1dmlmaamxe" +
   "7kaW1jDsYwp59HtyBqKw6JsAxUEHVswfPvaI6XVpgVUYCC11kfVme00KC97UJxx";
+const stripeProduct = "";
 const stripe = new Stripe(stripeKey, {apiVersion: "2022-11-15"});
-
-enum Product {
-  FULL_SCHEME = "prod_NOPdvEJI9cTqO4",
-  PARTIAL_SCHEME = "prod_NOPfwfyWvxemAO",
-  LAST_10_DAYS = "prod_NOPgvVnUse2LbEprod_NOPgvVnUse2LbE",
-}
-
-interface PaymentInfo {
-  product: Product,
-  iterations: number,
-  startDate: Date
-}
-
-/**
- * @param {DonationScheme} donationScheme
- * @return {Product}
- */
-function donationSchemeToProduct(donationScheme: DonationScheme) {
-  switch (donationScheme) {
-  case DonationScheme.FULL:
-    return Product.FULL_SCHEME;
-  case DonationScheme.PARTIAL:
-    return Product.PARTIAL_SCHEME;
-  case DonationScheme.LAST_10_DAYS:
-    return Product.LAST_10_DAYS;
-  }
-}
-
-/**
- * @param {DonationChoice} data
- * @return {PaymentInfo}
- */
-function producePaymentInfo(data: DonationChoice): PaymentInfo {
-  const info = processPaymentInfo(data);
-  return {
-    ...info,
-    product: donationSchemeToProduct(info.donationScheme),
-  };
-}
-
 
 /**
  * Make a customer on Stripe
  * @return {string} The customer ID
  */
-export async function makeCustomer({email, name, phone}: DonorInfo) {
-  const customer = await stripe.customers.create({email, name, phone});
+export async function makeCustomer({email, name, phone, address}: Application) {
+  const customer = await stripe.customers.create({
+    email, name, phone, metadata: {address},
+  });
   return customer.id;
 }
 
@@ -100,22 +63,22 @@ export async function setDefaultPaymentMethod(customerID: string) {
 
 /**
  * Creates a subscription schedule that charges daily.
- * @param {DonationApplicationWithCustomerID} data
- * @param {string} applicationID
+ * @param {Application} data
+ * @param {string} donationID
  */
 export async function createSubscriptionSchedule(
-  data: DonationApplicationWithCustomerID, applicationID: string,
+  data: ApplicationWithCustomer, donationID: string,
 ) {
-  const paymentInfo = producePaymentInfo(data);
+  const paymentInfo = processSubscriptionInfo(data);
   return await stripe.subscriptionSchedules.create({
     customer: data.customerID,
-    start_date: Math.floor(paymentInfo.startDate.getTime() / 1000),
+    start_date: Math.floor(paymentInfo.startDate / 1000),
     end_behavior: "cancel",
     phases: [
       {
         items: [{
           price_data: {
-            product: paymentInfo.product,
+            product: stripeProduct,
             currency: "gbp",
             recurring: {interval: "day"},
             tax_behavior: "inclusive",
@@ -126,11 +89,10 @@ export async function createSubscriptionSchedule(
       },
     ],
     metadata: {
-      name: data.name,
+      onBehalfOf: data.onBehalfOf,
       anonymous: JSON.stringify(data.anonymous),
       giftAid: JSON.stringify(data.giftAid),
-      wantsBrick: JSON.stringify(data.wantsBrick),
-      firestoreDocID: applicationID,
+      firestoreDocID: donationID,
     },
   });
 }

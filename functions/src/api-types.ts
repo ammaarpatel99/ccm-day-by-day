@@ -1,34 +1,32 @@
-import {SETTINGS} from "./settings";
+import {configuration} from "./settings";
 import {
-  DonationApplication,
-  DonationCheckoutSummaryPayload,
-  DonationSummaryPayload,
+  Application, ApplicationSummary, SubscriptionSummary,
 } from "./helpers";
+export {DonationLength} from "./helpers";
 
 export enum APIEndpoints {
   CONFIG = "config",
-  PRE_CHECKOUT_SUMMARY = "preCheckoutSummary",
-  CHECKOUT_SUMMARY = "checkoutSummary",
+  APPLICATION_SUMMARY = "applicationSummary",
+  GET_APPLICATION = "checkoutSummary",
   SETUP_PAYMENT = "setupPayment",
   SET_DEFAULT_PAYMENT_METHOD = "setDefaultPayment",
   SETUP_SUBSCRIPTION = "setupSubscription"
 }
 
 export type ConfigReq = void;
-export type ConfigRes = typeof SETTINGS;
+export type ConfigRes = ReturnType<typeof configuration>;
 
-export type SetupPaymentReq = DonationApplication & { successURL: string };
+export type SetupPaymentReq = Application & { successURL: string };
 export type SetupPaymentRes = { setupURL: string };
 
-export type PreCheckoutSummaryReq = DonationApplication;
-export type PreCheckoutSummaryRes = DonationCheckoutSummaryPayload;
+export type ApplicationSummaryReq = Application;
+export type ApplicationSummaryRes = ApplicationSummary;
 
-export type CheckoutSummaryReq = { applicationID: string };
-export type CheckoutSummaryRes = DonationCheckoutSummaryPayload;
+export type GetApplicationReq = { donationID: string };
+export type GetApplicationRes = ApplicationSummary;
 
-export type SetDefaultPaymentReq = {applicationID: string};
+export type SetDefaultPaymentReq = {donationID: string};
 export type SetDefaultPaymentRes = void;
 
-export type SetupSubscriptionReq = {applicationID: string};
-export type SetupSubscriptionRes = DonationSummaryPayload;
-export {DonationLength} from "./donationLength";
+export type SetupSubscriptionReq = {donationID: string};
+export type SetupSubscriptionRes = SubscriptionSummary;

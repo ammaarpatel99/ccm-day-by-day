@@ -1,129 +1,94 @@
-import {SETTINGS} from "./settings";
 import {DocumentReference, Timestamp} from "firebase-admin/lib/firestore";
-import {DonationLength} from "./donationLength";
+
+export enum DonationLength {
+  FULL_RAMADAN = "full_ramadan",
+  REMAINING_DAYS = "remaining_days",
+  LAST_10_DAYS = "last_10_days",
+}
 
 export interface DonationChoice {
   donationLength: DonationLength;
   amount: number;
 }
 
-export interface DonorInfo {
-  name: string;
-  email: string;
-  phone: string;
-}
-
-export interface DonationApplication {
+interface BaseApplication {
   donationLength: DonationLength;
   amount: number;
+  onBehalfOf: string;
   name: string;
   email: string;
   phone: string;
+  address: string;
   anonymous: boolean;
-  wantsBrick: boolean;
   giftAid: boolean;
 }
-
-export interface DonationApplicationWithCustomerID extends DonationApplication {
-  customerID: string
+export interface Application extends BaseApplication {
+  status: "application";
 }
 
-export interface DonationSubscriptionInfo {
+interface BaseApplicationWithCustomer extends BaseApplication {
+  customerID: string;
+}
+export interface ApplicationWithCustomer extends BaseApplicationWithCustomer {
+  status: "application_with_customer";
+}
+
+interface BaseSubscription extends BaseApplicationWithCustomer {
   scheduleID: string;
-  subscriptionID: string;
+  generalID: number;
+  targetID: number | null;
+  // The time in milliseconds (Date.getTime())
+  created: number;
+  emailSent: boolean;
+}
+export interface Subscription extends BaseSubscription {
+  status: "subscription";
+}
+
+export interface StoredSubscription extends Omit<Subscription, "created"> {
   created: Timestamp;
-  confirmationEmail: DocumentReference;
-  application: DocumentReference;
-  customerID: string
 }
 
-export enum DonationScheme {
-  FULL,
-  PARTIAL,
-  LAST_10_DAYS,
-}
+export type Donation = Application | Subscription | ApplicationWithCustomer;
+export type StoredDonation =
+  Exclude<Donation, Subscription> | StoredSubscription;
 
-export interface ProcessedDonationInfo {
-  startDate: Date;
-  donationScheme: DonationScheme;
-  eligibleForBrick: boolean;
+export interface ProcessedSubscriptionInfo {
+  // The time in milliseconds (Date.getTime())
+  startDate: number;
   iterations: number;
+  meetsTarget: boolean;
 }
 
-export type DonationCheckoutSummary =
-  DonationApplication & ProcessedDonationInfo;
-export type DonationCheckoutSummaryPayload =
-  Omit<DonationCheckoutSummary, "startDate"> & {startDate: number}
-
-export type DonationSummary =
-  DonationCheckoutSummary &
-  Omit<DonationSubscriptionInfo, "confirmationEmail"|"application">
-export type DonationSummaryPayload =
-  Omit<DonationSummary, "created"|"startDate"> &
-  {created: number; startDate: number}
-
+export type ApplicationSummary = Application & ProcessedSubscriptionInfo;
+export type SubscriptionSummary = Subscription & ProcessedSubscriptionInfo;
 
 /**
  * The difference between 2 dates in days.
- * @param {Date} date1 - The latest date (exclusive)
- * @param {Date} date2 - The earlier date (inclusive)
+ * The dates should be provided as produced by Date.getTime()
+ * @param {number} date1 - The latest date (exclusive) in milliseconds
+ * @param {number} date2 - The earlier date (inclusive) in milliseconds
  * @return {number} number of days
  */
-function differenceInDays(date1: Date, date2: Date) {
-  return Math.floor((date1.getTime() - date2.getTime()) / (1000*60*60*24));
+export function differenceInDays(date1: number, date2: number) {
+  return Math.floor((date1 - date2) / (1000*60*60*24));
 }
 
 /**
  * The current date with the time removed.
  * @return {Date}
  */
-function dateToday() {
+export function dateToday() {
   const date = new Date();
   date.setHours(0, 0, 0, 0);
-  return date;
+  return date.getTime();
 }
 
-/**
- * Produce payment info
- * @param {DonationChoice} data
- * @return {ProcessedDonationInfo}
- */
-export function processPaymentInfo(
-  data: DonationChoice
-): ProcessedDonationInfo {
-  if (data.donationLength === DonationLength.LAST_10_DAYS) {
-    return {
-      startDate: new Date(SETTINGS.last10Days),
-      donationScheme: DonationScheme.LAST_10_DAYS,
-      eligibleForBrick: false,
-      iterations: 10,
-    };
-  } else if (
-    data.donationLength === DonationLength.FULL_RAMADAN &&
-    data.amount >= SETTINGS.targetAmount
-  ) {
-    return {
-      startDate: new Date(SETTINGS.ramadanStartDate),
-      donationScheme: DonationScheme.FULL,
-      eligibleForBrick: true,
-      iterations: 30,
-    };
-  } else if (data.donationLength === DonationLength.FULL_RAMADAN) {
-    return {
-      startDate: new Date(SETTINGS.ramadanStartDate),
-      donationScheme: DonationScheme.PARTIAL,
-      eligibleForBrick: false,
-      iterations: 30,
-    };
-  } else {
-    const startDate = dateToday();
-    const iterations = 30 -
-      differenceInDays(startDate, new Date(SETTINGS.ramadanStartDate));
-    return {
-      startDate: startDate,
-      donationScheme: DonationScheme.PARTIAL,
-      eligibleForBrick: false,
-      iterations,
-    };
-  }
+export interface Counter {
+  general: number;
+  target: number;
+}
+
+export interface StoredIDDoc {
+  [key: string]: DocumentReference
 }

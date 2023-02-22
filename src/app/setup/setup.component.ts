@@ -179,8 +179,8 @@ export class SetupComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // if (this.checkoutState === CheckoutState.RE_ESTABLISHING) {
-    //   while (this.stepper.selectedIndex < 3) this.stepper.next()
-    // }
+    if (this.checkoutState === CheckoutState.RE_ESTABLISHING) {
+      this.stepper.steps.get(3)?.select()
+    }
   }
 }
