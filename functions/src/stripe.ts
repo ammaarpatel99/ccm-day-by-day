@@ -8,10 +8,9 @@ import {processSubscriptionInfo} from "./processSubscriptionInfo";
 
 // TODO: change stripe key to the live one
 // FIXME: roll stripe test key
-// TODO: add product ID
 const stripeKey = "sk_test_51MOiitFg1jrvwujseQk1ciZYu1dmlmaamxe" +
   "7kaW1jDsYwp59HtyBqKw6JsAxUEHVswfPvaI6XVpgVUYCC11kfVme00KC97UJxx";
-const stripeProduct = "";
+const stripeProduct = "prod_NOPh6gURBdjBwE";
 const stripe = new Stripe(stripeKey, {apiVersion: "2022-11-15"});
 
 /**
