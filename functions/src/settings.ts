@@ -19,9 +19,18 @@ const targetAmount = 30;
 
 const brickLimit = 300;
 
+const disclaimer = "All money given to the Cambridge Central " +
+  "Mosque (CCM) through this scheme is a donation to the Cambridge Mosque " +
+  "Trust (CMT) which manages CCM. \n" +
+  "Out of those who complete the full Day By Day scheme (£30/day for 30 days " +
+  "during Ramadan), the first 300 will be offered the gift of a framed brick " +
+  "at a ceremony to take place at CCM. \n" +
+  "If you did not select the anonymous option, you consent to your " +
+  "name being used publically in a list of donors (such as on a digital wall).";
+
 export const configuration = () => {
   return {
     ramadanStartDate, last10Days, minimumAmount, targetAmount, presetAmounts,
-    brickLimit, donationLengths: donationLengths(),
+    brickLimit, disclaimer, donationLengths: donationLengths(),
   };
 };

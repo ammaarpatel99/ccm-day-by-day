@@ -17,9 +17,10 @@ const transporter = createTransport({
 export async function sendConfirmationEmail(
   data: SubscriptionSummary, donationID: string,
 ) {
+  const config = configuration();
   let brickTxt = "";
   if (!data.meetsTarget) {
-    if ((data.targetID || 0) < configuration().brickLimit) {
+    if ((data.targetID || 0) < config.brickLimit) {
       brickTxt =
         "\n\nCongratulations! You are amongst the first 300 to sign up for" +
         " the full Day By Day Scheme. If you complete the donation of £30 " +
@@ -56,6 +57,7 @@ export async function sendConfirmationEmail(
     "\nPhone Number: " + data.phone +
     "\nAddress: " + data.address +
     "\nGift Aid: " + data.giftAid ? "Yes" : "No" +
+    "\n\nDisclaimer:\n" + config.disclaimer +
     "\n\n\nBest wishes," +
     "\nAdmin Team" +
     "\n<a href='cambridgecentralmosque.org'>" +

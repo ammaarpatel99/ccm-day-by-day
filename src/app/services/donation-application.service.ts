@@ -59,7 +59,7 @@ export class DonationApplicationService implements OnDestroy {
       this.donationLength.setValue(DonationLength.FULL_RAMADAN)
     } else this.donationLength.setValue(donationLengths[0])
     this.donationLength.addValidators(control =>
-      donationLengths.includes(control.value) ? null : {invalidDonationLength: "invalidDonationLength"})
+      donationLengths.includes(control.value) ? null : {invalidDonationLength: "invalid donation length"})
   }
 
   private showBackdatingNote(donationLengths: DonationLength[], ramadanStartDate: Date, last10Days: Date) {

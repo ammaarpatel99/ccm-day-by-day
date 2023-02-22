@@ -19,7 +19,8 @@
       <div class="amounts-container">
         <button
           mat-raised-button color="primary"
-          *ngFor="let presetAmount of (showPresetAmounts || [])"
+          *ngFor="let presetAmount of (showPresetAmounts || []); first as isFirst"
+          [class.firstBtn]="isFirst"
           (click)="setAmount(presetAmount)"
         >£{{presetAmount}} / day</button>
       </div>
@@ -31,6 +32,7 @@
         <mat-label>Custom Amount</mat-label>
         <input matInput type="number" placeholder="0.00"  [formControl]="amount">
         <span matTextPrefix>£&nbsp;</span>
+        <mat-error *ngIf="amount.invalid">{{errorMessage(amount)}}</mat-error>
       </mat-form-field>
     </div>
     <div class="actions-container">
@@ -77,23 +79,20 @@
     <p>If you do not wish the donation to be noted on our website and other media, please check the anonymous option.</p>
     <mat-slide-toggle color="primary" [formControl]="donorInfo.controls.anonymous">Anonymous</mat-slide-toggle>
     <h2>Consent</h2>
+    <h4>Gift Aid</h4>
     <p>
       If you are a UK taxpayer and are eligible for Gift Aid, you may select the below option.
       If you do we will get in touch regarding registering your Day By Day donation for Gift Aid, which will result
       in the <b>government contributing an additional 25%</b> to your donation.
     </p>
-    <mat-slide-toggle [formControl]="consent.controls.giftAid" color="primary">Gift Aid</mat-slide-toggle>
+    <mat-slide-toggle [formControl]="consent.controls.giftAid" color="primary">Consent to Gift Aid</mat-slide-toggle>
+    <h4>Disclaimer</h4>
+    <p *ngFor="let line of disclaimer">{{line}}</p>
+    <mat-slide-toggle [formControl]="consent.controls.disclaimer" color="primary">Accept the disclaimer</mat-slide-toggle>
+    <h4>Data and Privacy Policy</h4>
     <mat-slide-toggle [formControl]="consent.controls.privacy" color="primary">
       Accept our <a href="https://cambridgecentralmosque.org/legal/" target="_blank" rel="noopener noreferer">Data & Privacy Policy</a>
     </mat-slide-toggle>
-    <p>
-      Disclaimer - All money given to the Cambridge Central Mosque (CCM) through this scheme is a donation to the
-      Cambridge Mosque Trust (CMT) which manages CCM.<br/>
-      Out of those who complete the full Day By Day scheme (£30/day for 30 days during Ramadan), the first 300 will be offered the gift of a
-      framed brick at a ceremony to take place at CCM.<br/>
-      If you did not select the anonymous option, you consent to your name being used publically in a list of donors (such as on a digital wall).
-    </p>
-    <mat-slide-toggle [formControl]="consent.controls.disclaimer" color="primary">I accept the disclaimer</mat-slide-toggle>
     <div class="actions-container">
       <button mat-stroked-button matStepperPrevious>BACK</button>
       <button mat-stroked-button color="primary" matStepperNext [disabled]="!donationDetailsComplete">NEXT</button>

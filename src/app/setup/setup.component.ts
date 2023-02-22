@@ -4,7 +4,7 @@ import {DonationApplicationService} from "../services/donation-application.servi
 import {CheckoutState, SetupService} from "../services/setup.service";
 import {DonationLength} from "../../../functions/src/api-types";
 import {ConfigService} from "../services/config.service";
-import {map, switchMap} from "rxjs";
+import {map, switchMap, take, tap} from "rxjs";
 import {
   ApplicationSummary,
   SubscriptionSummary
@@ -57,6 +57,7 @@ export class SetupComponent implements OnInit, AfterViewInit {
   get canEdit() {
     return this.checkoutState === this.checkoutStates.NOT_BEGUN
   }
+  disclaimer: string[] = [];
 
   get donationLengthComplete() {
     return !this.showDonationLengths || (this.donationLength.valid && this.donationLength.dirty)
@@ -133,9 +134,15 @@ export class SetupComponent implements OnInit, AfterViewInit {
   }
 
   errorMessage(control: FormControl) {
-    const errors = Object.entries(control.errors || {})
-    if (errors.length === 0) return "";
-    return errors[0][1];
+    if (control.hasError("required")) return "This field is required";
+    if (control.hasError("maxlength")) {
+      const err = control.getError("maxlength")
+      return `Your input is ${err.actualLength - err.requiredLength} characters too long`;
+    }
+    if (control.hasError("email")) return "This is not a valid email";
+    if (control.hasError("min")) return "The amount must be at least " + control.getError("min").min;
+    if (control.invalid) return Object.entries(control.errors || {})[0][1];
+    return ""
   }
 
   constructor(
@@ -146,6 +153,10 @@ export class SetupComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.configService.config$.pipe(
+      map(data => data.disclaimer.split('\n')),
+      take(1)
+    ).subscribe(data => this.disclaimer = data)
     if (this.checkoutState === CheckoutState.RE_ESTABLISHING) {
       this._checkoutLoadingState = {show: true, mode: "indeterminate", value: 0}
       this.setupService.getCheckoutSummary().pipe(
