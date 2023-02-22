@@ -9,11 +9,61 @@
 // Be sure that you only ever include this mixin once!
 @include mat.core();
 
+$ccm-gold-palette: (
+  50: #fefced,
+  100: #fdf7d2,
+  200: #fcf3b6,
+  300: #faee9e,
+  400: #f8e98c,
+  500: #f5e47d,
+  600: #e5d377,
+  700: #d0bd6f,
+  800: #baa769,
+  900: #948361,
+  contrast: (
+    50: #f9f9f9,
+    100: #f3f3f3,
+    200: #eaeaea,
+    300: #dadada,
+    400: #b7b7b7,
+    500: #979797,
+    600: #6f6f6f,
+    700: #5b5b5b,
+    800: #3c3c3c,
+    900: #1c1c1c,
+  )
+);
+
+$ccm-triadic-palette: (
+  50: #ebf5e9,
+  100: #cee5c8,
+  200: #b0d5a6,
+  300: #92c683,
+  400: #7cba69,
+  500: #68ae4f,
+  600: #5e9f47,
+  700: #528d3c,
+  800: #477c33,
+  900: #325e22,
+  contrast: (
+    50: #e3f3f0,
+    100: #bae1d8,
+    200: #90cec0,
+    300: #69baa7,
+    400: #52aa95,
+    500: #439b84,
+    600: #3e8e78,
+    700: #387e69,
+    800: #316e5b,
+    900: #265141,
+  )
+);
+
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$ccm-day-by-day-primary: mat.define-palette(mat.$yellow-palette, 700);
-$ccm-day-by-day-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$ccm-day-by-day-primary: mat.define-palette($ccm-gold-palette, 800);
+$ccm-day-by-day-accent: mat.define-palette($ccm-triadic-palette, 400);
 
 // The warn palette is optional (defaults to red).
 $ccm-day-by-day-warn: mat.define-palette(mat.$red-palette);
