@@ -36,7 +36,7 @@
           <mat-label>Custom Amount</mat-label>
           <input matInput type="number" placeholder="0.00"  [formControl]="amount">
           <span matTextPrefix>£&nbsp;</span>
-          <span matTextSuffix=""> / day</span>
+          <span matTextSuffix="">/day</span>
           <mat-error *ngIf="amount.invalid">{{errorMessage(amount)}}</mat-error>
         </mat-form-field>
       </div>
