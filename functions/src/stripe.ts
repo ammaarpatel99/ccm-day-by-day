@@ -1,9 +1,5 @@
 import Stripe from "stripe";
-import {
-  Application,
-  ApplicationWithCustomer,
-
-} from "./helpers";
+import {Application, ApplicationWithCustomer} from "./helpers";
 import {processSubscriptionInfo} from "./processSubscriptionInfo";
 
 // TODO: change stripe key to the live one
@@ -73,25 +69,24 @@ export async function createSubscriptionSchedule(
     customer: data.customerID,
     start_date: Math.floor(paymentInfo.startDate / 1000),
     end_behavior: "cancel",
-    phases: [
-      {
-        items: [{
-          price_data: {
-            product: stripeProduct,
-            currency: "gbp",
-            recurring: {interval: "day"},
-            tax_behavior: "inclusive",
-            unit_amount: data.amount * 100,
-          },
-        }],
-        iterations: paymentInfo.iterations,
+    phases: [{
+      items: [{
+        price_data: {
+          product: stripeProduct,
+          currency: "gbp",
+          recurring: {interval: "day"},
+          tax_behavior: "inclusive",
+          unit_amount: data.amount * 100,
+        },
+      }],
+      billing_cycle_anchor: "phase_start",
+      iterations: paymentInfo.iterations,
+      metadata: {
+        onBehalfOf: data.onBehalfOf,
+        anonymous: JSON.stringify(data.anonymous),
+        giftAid: JSON.stringify(data.giftAid),
+        donationID: donationID,
       },
-    ],
-    metadata: {
-      onBehalfOf: data.onBehalfOf,
-      anonymous: JSON.stringify(data.anonymous),
-      giftAid: JSON.stringify(data.giftAid),
-      firestoreDocID: donationID,
-    },
+    }],
   });
 }

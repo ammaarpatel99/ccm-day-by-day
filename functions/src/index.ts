@@ -3,16 +3,21 @@ import {db} from "./database";
 import {
   createSetupSession,
   createSubscriptionSchedule,
-  makeCustomer, setDefaultPaymentMethod,
+  makeCustomer,
+  setDefaultPaymentMethod,
 } from "./stripe";
 import {
+  ApplicationSummaryReq,
+  ApplicationSummaryRes,
+  ConfigRes,
   GetApplicationReq,
   GetApplicationRes,
-  ConfigRes, ApplicationSummaryReq, ApplicationSummaryRes,
   SetDefaultPaymentReq,
   SetDefaultPaymentRes,
   SetupPaymentReq,
-  SetupPaymentRes, SetupSubscriptionReq, SetupSubscriptionRes,
+  SetupPaymentRes,
+  SetupSubscriptionReq,
+  SetupSubscriptionRes,
 } from "./api-types";
 import {configuration} from "./settings";
 import {processSubscriptionInfo} from "./processSubscriptionInfo";
@@ -89,8 +94,9 @@ export const setupSubscription = functions.https.onCall(
     );
     const subscription: Subscription = {
       ...docData, status: "subscription", generalID: IDs.general,
-      targetID: IDs.target, scheduleID: schedule.id,
-      created: schedule.created * 1000, emailSent: false,
+      targetID: paymentInfo.meetsTarget ? IDs.target : null,
+      scheduleID: schedule.id, created: schedule.created * 1000,
+      emailSent: false,
     };
     await doc.set(subscription);
     await sendConfirmationEmail(
