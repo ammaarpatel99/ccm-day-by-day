@@ -2,7 +2,7 @@ import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {DonationLength} from "../../../functions/src/api-types";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfigService} from "./config.service";
-import {AsyncSubject, shareReplay, startWith, switchMap, takeUntil, tap} from "rxjs";
+import {AsyncSubject, shareReplay, takeUntil, tap} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -18,16 +18,15 @@ export class DonationApplicationService implements OnDestroy {
   private _showPresetAmounts: false | number[] = false
   get showPresetAmounts() {return this._showPresetAmounts}
   readonly donationAmount = new FormControl(0)
-  private _eligibleForBrick = false
-  get eligibleForBrick() {return this._eligibleForBrick}
   readonly donorInfo = new FormGroup({
-    name: new FormControl("", [Validators.required, Validators.minLength(2), Validators.maxLength(25)]),
-    anonymous: new FormControl(false, Validators.required),
-    wantsBrick: new FormControl(true, Validators.required)
+    onBehalfOf: new FormControl("", [Validators.maxLength(25)]),
+    anonymous: new FormControl(false, Validators.required)
   })
   readonly contactInfo = new FormGroup({
+    name: new FormControl("", Validators.required),
     email: new FormControl("", [Validators.required, Validators.email]),
-    phone: new FormControl("", Validators.required)
+    phone: new FormControl("", Validators.required),
+    address: new FormControl("", Validators.required)
   })
   readonly consent = new FormGroup({
     giftAid: new FormControl(false, Validators.required),
@@ -39,6 +38,7 @@ export class DonationApplicationService implements OnDestroy {
     private readonly configService: ConfigService
   ) {
     this.setupWithConfig().subscribe()
+    // TODO: add popup warning about not being eligible for brick. only show popup once.
   }
 
   setupWithConfig() {
@@ -48,7 +48,6 @@ export class DonationApplicationService implements OnDestroy {
         this._showNoteAboutBackdating = this.showBackdatingNote(data.donationLengths, data.ramadanStartDate, data.last10Days)
         this.setupAmounts(data.presetAmounts, data.minimumAmount, data.targetAmount)
       }),
-      switchMap(data => this.setupEligibleForBrick(data.targetAmount)),
       shareReplay(1),
       takeUntil(this.destroyed)
     )
@@ -81,15 +80,6 @@ export class DonationApplicationService implements OnDestroy {
         Math.floor(control.value * 100) / 100 === control.value ? null
           : {invalidAmount: `Amount cannot have more than 2 decimal places.`}
     ])
-  }
-
-  private setupEligibleForBrick(targetAmount: number) {
-    return this.donationAmount.valueChanges.pipe(
-      startWith(0),
-      tap(amount => {
-        this._eligibleForBrick = !!amount && amount >= targetAmount
-      })
-    )
   }
 
   ngOnDestroy(): void {

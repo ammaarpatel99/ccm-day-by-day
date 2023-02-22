@@ -19,7 +19,7 @@ export async function sendConfirmationEmail(
 ) {
   let brickTxt = "";
   if (!data.meetsTarget) {
-    if ((data.targetID || 0) < configuration().targetAmount) {
+    if ((data.targetID || 0) < configuration().brickLimit) {
       brickTxt =
         "\n\nCongratulations! You are amongst the first 300 to sign up for" +
         " the full Day By Day Scheme. If you complete the donation of £30 " +

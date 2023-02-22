@@ -8,8 +8,8 @@
     </p>
     <button
       mat-raised-button color="primary"
-      *ngFor="let donationLength of (showDonationLengths || [])"
-      (click)="selectDonationLength(donationLength)"
+      *ngFor="let donationLength of (showDonationLengths || []); let first = first"
+      (click)="selectDonationLength(donationLength)" [class.first-button]="first"
     >{{getDonationLengthText(donationLength)}}</button>
   </mat-step>
 
@@ -21,8 +21,9 @@
           mat-raised-button color="primary"
           *ngFor="let presetAmount of (showPresetAmounts || [])"
           (click)="setAmount(presetAmount)"
-        >{{presetAmount | currency:"GBP"}} / day</button>
+        >£{{presetAmount}} / day</button>
       </div>
+      <!-- TODO: add custom amount button -->
       <mat-divider></mat-divider>
     </ng-container>
     <div class="custom-amounts-container">
@@ -40,39 +41,40 @@
 
   <mat-step [editable]="canEdit" [completed]="!canEdit || donationDetailsComplete">
     <ng-template matStepLabel>Details</ng-template>
-    <h2>Donor Details:</h2>
+    <h2>Donate on behalf of:</h2>
+    <h3>(Can be yourself or someone else)</h3>
     <p>
-      Your name or the name of whoever you wish to donate on behalf of. Max 25 character.
-      <span *ngIf="eligibleForBrick">
-        If you are amongst those gifted a framed brick, this name will be on the plaque.
-      </span>
+      If you are gifted a framed brick, this name will be on the plaque.
+      If you are listed on the digital wall of donors, this name will be on the wall.<br/>
+      Max 25 characters.
     </p>
     <mat-form-field>
-      <mat-label>Name</mat-label>
-      <input matInput [formControl]="donorInfo.controls.name">
+      <mat-label>Name:</mat-label>
+      <input matInput [formControl]="donorInfo.controls.onBehalfOf" placeholder="Donate on behalf of:">
+      <mat-error *ngIf="donorInfo.controls.onBehalfOf.invalid">{{errorMessage(donorInfo.controls.onBehalfOf)}}</mat-error>
     </mat-form-field>
-    <p>If you do not wish your donation to be noted on our website and other media, please check the anonymous option.</p>
+    <p>If you do not wish the donation to be noted on our website and other media, please check the anonymous option.</p>
     <mat-slide-toggle color="primary" [formControl]="donorInfo.controls.anonymous">Anonymous</mat-slide-toggle>
-    <ng-container *ngIf="eligibleForBrick">
-      <p>
-        Of those who complete the full Day By Day donation scheme of {{minimumAmount | async | currency:"GBP"}} per day,
-        the first 300 who signed up will be gifted a framed brick from the Cambridge Central Mosque at a ceremony with Sheikh Abdal Hakim Murad.
-        There is more information on our <a href="https://cambridgecentralmosque.org/daybyday" target="_blank" rel="noopener noreferer">website</a>.
-        <br/>
-        If you are eligible, would you like to receive the gift?
-      </p>
-      <mat-slide-toggle color="primary" [formControl]="donorInfo.controls.wantsBrick">
-        Receive Framed Brick if Eligible
-      </mat-slide-toggle>
-    </ng-container>
     <h2>Contact Details:</h2>
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput placeholder="Your Name" [formControl]="contactInfo.controls.name">
+      <mat-error *ngIf="contactInfo.controls.name.invalid">{{errorMessage(contactInfo.controls.name)}}</mat-error>
+    </mat-form-field>
     <mat-form-field>
       <mat-label>Email</mat-label>
       <input matInput placeholder="xxx@example.com" [formControl]="contactInfo.controls.email">
+      <mat-error *ngIf="contactInfo.controls.email.invalid">{{errorMessage(contactInfo.controls.email)}}</mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Phone Number</mat-label>
       <input matInput placeholder="+XX XXXX XXXXXX" [formControl]="contactInfo.controls.phone">
+      <mat-error *ngIf="contactInfo.controls.phone.invalid">{{errorMessage(contactInfo.controls.phone)}}</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Address (including Post Code)</mat-label>
+      <input matInput placeholder="309-313 Mill Rd, Cambridge, CB1 3DF, UK" [formControl]="contactInfo.controls.address">
+      <mat-error *ngIf="contactInfo.controls.address.invalid">{{errorMessage(contactInfo.controls.address)}}</mat-error>
     </mat-form-field>
     <h2>Consent</h2>
     <p>
@@ -85,11 +87,11 @@
       Accept our <a href="https://cambridgecentralmosque.org/legal/" target="_blank" rel="noopener noreferer">Data & Privacy Policy</a>
     </mat-slide-toggle>
     <p>
-      Disclaimer - All money given to the Cambridge Central Mosque through this scheme is a donation to the
-      Cambridge Mosque Trust. Any framed bricks distributed are gifts given at the Trust's discretion
-      in line with their Day By Day Ramadan 2023 Scheme. The Trust may change the Terms of the Day By Day Scheme
-      at its discretion.<br/>
-      The donations are processed by Stripe, who take a transaction fee which varies depending on the payment method.
+      Disclaimer - All money given to the Cambridge Central Mosque (CCM) through this scheme is a donation to the
+      Cambridge Mosque Trust (CMT) which manages CCM.<br/>
+      Out of those who complete the full Day By Day scheme (£30/day for 30 days during Ramadan), the first 300 will be offered the gift of a
+      framed brick at a ceremony to take place at CCM.<br/>
+      If you did not select the anonymous option, you consent to your name being used publically in a list of donors (such as on a digital wall).
     </p>
     <mat-slide-toggle [formControl]="consent.controls.disclaimer" color="primary">I accept the disclaimer</mat-slide-toggle>
     <div class="actions-container">
@@ -110,17 +112,18 @@
     </div>
     <ng-container *ngIf="checkoutSummary != null">
       <h2>Summary:</h2>
-      <p>Daily Amount: {{checkoutSummary.amount | currency:"GBP"}}</p>
-      <p>Start Date: {{numberToDate(checkoutSummary.startDate) | date:"dd/MM/yyyy"}}</p>
-      <p>Duration: {{checkoutSummary.iterations}} days</p>
+      <p>Daily Amount: <b>{{checkoutSummary.amount | currency:"GBP"}} / day</b></p>
+      <p>Start Date: <b>{{numberToDate(checkoutSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
+      <p>Duration: <b>{{checkoutSummary.iterations}} days</b></p>
       <br/>
-      <p>Name: {{checkoutSummary.name}}</p>
-      <p>Anonymous: {{checkoutSummary.anonymous}}</p>
-      <p *ngIf="checkoutSummary.eligibleForBrick">Receive Framed Brick if Eligible: {{checkoutSummary.wantsBrick}}</p>
+      <p>On behalf of: <b>{{checkoutSummary.onBehalfOf}}</b></p>
+      <p>Anonymous: <b>{{checkoutSummary.anonymous}}</b></p>
       <br/>
-      <p>Email: {{checkoutSummary.email}}</p>
-      <p>Phone Number: {{checkoutSummary.phone}}</p>
-      <p>Gift Aid: {{checkoutSummary.giftAid ? "Yes" : "No"}}</p>
+      <p>Name: <b>{{checkoutSummary.name}}</b></p>
+      <p>Email: <b>{{checkoutSummary.email}}</b></p>
+      <p>Phone Number: <b>{{checkoutSummary.phone}}</b></p>
+      <p>Address: <b>{{checkoutSummary.address}}</b></p>
+      <p>Gift Aid: <b>{{checkoutSummary.giftAid ? "Yes" : "No"}}</b></p>
     </ng-container>
     <ng-container *ngIf="checkoutState === checkoutStates.NOT_BEGUN">
       <h2>Setup the Donation</h2>
@@ -140,24 +143,23 @@
     <ng-template matStepLabel>Complete</ng-template>
     <h2>
       Your Day By Day donation has been setup!<br/>
-      You should have received a confirmation email confirming the details.
+      You should have received a confirmation email confirming the details,
+      including whether you are amongst those who will be recieving a framed brick as a gift.
     </h2>
     <ng-container *ngIf="fullSummary !== null">
       <h3>Summary:</h3>
-      <p>ID: {{fullSummary.subscriptionID}}</p>
-      <p>Created: {{numberToDate(fullSummary.created) | date:"dd/MM/yyyy"}}</p>
+      <p>Daily Amount: <b>{{fullSummary.amount | currency:"GBP"}} / day</b></p>
+      <p>Start Date: <b>{{numberToDate(fullSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
+      <p>Duration: <b>{{fullSummary.iterations}} days</b></p>
       <br/>
-      <p>Daily Amount: {{fullSummary.amount | currency:"GBP"}}</p>
-      <p>Start Date: {{numberToDate(fullSummary.startDate) | date:"dd/MM/yyyy"}}</p>
-      <p>Duration: {{fullSummary.iterations}} days</p>
+      <p>On behalf of: <b>{{fullSummary.onBehalfOf}}</b></p>
+      <p>Anonymous: <b>{{fullSummary.anonymous}}</b></p>
       <br/>
-      <p>Name: {{fullSummary.name}}</p>
-      <p>Anonymous: {{fullSummary.anonymous}}</p>
-      <p *ngIf="fullSummary.eligibleForBrick">Receive Framed Brick if Eligible: {{fullSummary.wantsBrick}}</p>
-      <br/>
-      <p>Email: {{fullSummary.email}}</p>
-      <p>Phone Number: {{fullSummary.phone}}</p>
-      <p>Gift Aid: {{fullSummary.giftAid ? "Yes" : "No"}}</p>
+      <p>Name: <b>{{fullSummary.name}}</b></p>
+      <p>Email: <b>{{fullSummary.email}}</b></p>
+      <p>Phone Number: <b>{{fullSummary.phone}}</b></p>
+      <p>Address: <b>{{fullSummary.address}}</b></p>
+      <p>Gift Aid: <b>{{fullSummary.giftAid ? "Yes" : "No"}}</b></p>
     </ng-container>
 
     <button mat-stroked-button color="primary" (click)="goToMainSite()">Return to Main Website</button>

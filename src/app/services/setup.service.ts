@@ -3,11 +3,11 @@ import {from, map, of, switchMap, tap} from "rxjs";
 import {Functions, httpsCallable} from "@angular/fire/functions";
 import {
   APIEndpoints,
-  CheckoutSummaryReq,
-  CheckoutSummaryRes,
+  ApplicationSummaryReq,
+  ApplicationSummaryRes,
   DonationLength,
-  PreCheckoutSummaryReq,
-  PreCheckoutSummaryRes,
+  GetApplicationReq,
+  GetApplicationRes,
   SetDefaultPaymentReq,
   SetDefaultPaymentRes,
   SetupPaymentReq,
@@ -33,21 +33,23 @@ export class SetupService {
   private readonly successURL = `${location.origin}/paymentsetup`;
   private _checkoutState: CheckoutState = CheckoutState.NOT_BEGUN;
   get checkoutState() { return this._checkoutState }
-  private checkoutData = {applicationID: '', checkoutID: ''}
+  private checkoutData = {donationID: '', checkoutID: ''}
 
   getPreCheckoutSummary() {
     return of(true).pipe(
       tap(() => this._checkoutState = CheckoutState.PRE_CHECKOUT_LOADING),
       switchMap(() =>
-        from(httpsCallable<PreCheckoutSummaryReq, PreCheckoutSummaryRes>(this.functions, APIEndpoints.PRE_CHECKOUT_SUMMARY)({
+        from(httpsCallable<ApplicationSummaryReq, ApplicationSummaryRes>(this.functions, APIEndpoints.APPLICATION_SUMMARY)({
           email: this.applicationService.contactInfo.controls.email.value as string,
           phone: this.applicationService.contactInfo.controls.phone.value as string,
-          name: this.applicationService.donorInfo.controls.name.value as string,
-          wantsBrick: this.applicationService.donorInfo.controls.wantsBrick.value as boolean,
+          name: this.applicationService.contactInfo.controls.name.value as string,
+          address: this.applicationService.contactInfo.controls.address.value as string,
           giftAid: this.applicationService.consent.controls.giftAid.value as boolean,
+          onBehalfOf: this.applicationService.donorInfo.controls.onBehalfOf.value as string,
           anonymous: this.applicationService.donorInfo.controls.anonymous.value as boolean,
           amount: this.applicationService.donationAmount.value as number,
-          donationLength: this.applicationService.donationLength.value as DonationLength
+          donationLength: this.applicationService.donationLength.value as DonationLength,
+          status: "application"
         }))
       ),
       map(({data}) => data),
@@ -58,8 +60,8 @@ export class SetupService {
   getCheckoutSummary() {
     return of(true).pipe(
       switchMap(() =>
-        from(httpsCallable<CheckoutSummaryReq, CheckoutSummaryRes>(this.functions, APIEndpoints.CHECKOUT_SUMMARY)({
-          applicationID: this.checkoutData.applicationID
+        from(httpsCallable<GetApplicationReq, GetApplicationRes>(this.functions, APIEndpoints.GET_APPLICATION)({
+          donationID: this.checkoutData.donationID
         }))
       ),
       map(({data}) => data),
@@ -74,12 +76,14 @@ export class SetupService {
         from(httpsCallable<SetupPaymentReq, SetupPaymentRes>(this.functions, APIEndpoints.SETUP_PAYMENT)({
           email: this.applicationService.contactInfo.controls.email.value as string,
           phone: this.applicationService.contactInfo.controls.phone.value as string,
-          name: this.applicationService.donorInfo.controls.name.value as string,
-          wantsBrick: this.applicationService.donorInfo.controls.wantsBrick.value as boolean,
+          name: this.applicationService.contactInfo.controls.name.value as string,
+          address: this.applicationService.contactInfo.controls.address.value as string,
           giftAid: this.applicationService.consent.controls.giftAid.value as boolean,
+          onBehalfOf: this.applicationService.donorInfo.controls.onBehalfOf.value as string,
           anonymous: this.applicationService.donorInfo.controls.anonymous.value as boolean,
           amount: this.applicationService.donationAmount.value as number,
           donationLength: this.applicationService.donationLength.value as DonationLength,
+          status: "application",
           successURL: this.successURL
         }))
       ),
@@ -93,7 +97,7 @@ export class SetupService {
     return of(true).pipe(
       switchMap(() =>
         from(httpsCallable<SetDefaultPaymentReq, SetDefaultPaymentRes>(this.functions, APIEndpoints.SET_DEFAULT_PAYMENT_METHOD)({
-          applicationID: this.checkoutData.applicationID
+          donationID: this.checkoutData.donationID
         }))
       ),
       map(() => {}),
@@ -105,7 +109,7 @@ export class SetupService {
     return of(true).pipe(
       switchMap(() =>
         from(httpsCallable<SetupSubscriptionReq, SetupSubscriptionRes>(this.functions, APIEndpoints.SETUP_SUBSCRIPTION)({
-          applicationID: this.checkoutData.applicationID
+          donationID: this.checkoutData.donationID
         }))
       ),
       map(({data}) => data),
@@ -113,9 +117,9 @@ export class SetupService {
     )
   }
 
-  completePaymentSetup(applicationID: string, checkoutID: string) {
+  completePaymentSetup(donationID: string, checkoutID: string) {
     this._checkoutState = CheckoutState.RE_ESTABLISHING
-    this.checkoutData = {applicationID, checkoutID}
+    this.checkoutData = {donationID, checkoutID}
     console.log(this.checkoutData)
   }
 

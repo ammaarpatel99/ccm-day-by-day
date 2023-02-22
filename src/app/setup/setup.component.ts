@@ -6,9 +6,10 @@ import {DonationLength} from "../../../functions/src/api-types";
 import {ConfigService} from "../services/config.service";
 import {map, switchMap} from "rxjs";
 import {
-  DonationCheckoutSummaryPayload,
-  DonationSummaryPayload
+  ApplicationSummary,
+  SubscriptionSummary
 } from "../../../functions/src/helpers";
+import {FormControl} from "@angular/forms";
 
 @Component({
   selector: 'app-setup',
@@ -20,61 +21,50 @@ export class SetupComponent implements OnInit, AfterViewInit {
   get showDonationLengths() {
     return this.applicationService.showDonationLengths
   }
-
   get showBackdatingNote() {
     return this.applicationService.showNoteAboutBackdating
   }
-
   get showPresetAmounts() {
     return this.applicationService.showPresetAmounts
   }
-
   get amount() {
     return this.applicationService.donationAmount
   }
-
   get donationLength() {
     return this.applicationService.donationLength
   }
-
   get donorInfo() {
     return this.applicationService.donorInfo
   }
-
   get contactInfo() {
     return this.applicationService.contactInfo
   }
-
   get consent() {
     return this.applicationService.consent
   }
-
-  get eligibleForBrick() {
-    return this.applicationService.eligibleForBrick
-  }
-
   get minimumAmount() {
     return this.configService.config$.pipe(
       map(data => data.minimumAmount)
     )
   }
-
-  private _checkoutSummary: DonationCheckoutSummaryPayload | null = null;
-  get checkoutSummary() {
-    return this._checkoutSummary
-  }
-
-  private _fullSummary: DonationSummaryPayload | null = null;
-  get fullSummary() {
-    return this._fullSummary
-  }
-
   get checkoutState() {
     return this.setupService.checkoutState
   }
-
   get checkoutStates() {
     return CheckoutState
+  }
+  get canEdit() {
+    return this.checkoutState === this.checkoutStates.NOT_BEGUN
+  }
+
+  get donationLengthComplete() {
+    return !this.showDonationLengths || (this.donationLength.valid && this.donationLength.dirty)
+  }
+  get donationAmountComplete() {
+    return this.amount.valid && this.amount.dirty
+  }
+  get donationDetailsComplete() {
+    return this.donorInfo.valid && this.contactInfo.valid && this.consent.valid
   }
 
   private _checkoutLoadingState: {
@@ -84,20 +74,14 @@ export class SetupComponent implements OnInit, AfterViewInit {
     return this._checkoutLoadingState
   }
 
-  get canEdit() {
-    return this.checkoutState === this.checkoutStates.NOT_BEGUN
+  private _checkoutSummary: ApplicationSummary | null = null;
+  get checkoutSummary() {
+    return this._checkoutSummary
   }
 
-  get donationLengthComplete() {
-    return !this.showDonationLengths || (this.donationLength.valid && this.donationLength.dirty)
-  }
-
-  get donationAmountComplete() {
-    return this.amount.valid && this.amount.dirty
-  }
-
-  get donationDetailsComplete() {
-    return this.donorInfo.valid && this.contactInfo.valid && this.consent.valid
+  private _fullSummary: SubscriptionSummary | null = null;
+  get fullSummary() {
+    return this._fullSummary
   }
 
   getDonationLengthText(donationLength: DonationLength) {
@@ -145,6 +129,12 @@ export class SetupComponent implements OnInit, AfterViewInit {
 
   numberToDate(n: number) {
     return new Date(n)
+  }
+
+  errorMessage(control: FormControl) {
+    const errors = Object.entries(control.errors || {})
+    if (errors.length === 0) return "";
+    else return errors[0][1];
   }
 
   constructor(
