@@ -20,38 +20,42 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import { LoadingComponent } from './loading/loading.component';
 import { PaymentSetupComponent } from './payment-setup/payment-setup.component';
 import {MatProgressBarModule} from "@angular/material/progress-bar";
+import { NoBrickDialogComponent } from './no-brick-dialog/no-brick-dialog.component';
+import {MatDialogModule} from "@angular/material/dialog";
 
 @NgModule({
   declarations: [
     AppComponent,
     SetupComponent,
     LoadingComponent,
-    PaymentSetupComponent
+    PaymentSetupComponent,
+    NoBrickDialogComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFunctions(() => {
-      const functions = getFunctions();
-      if (!environment.production) {
-        connectFunctionsEmulator(functions, 'localhost', 5001);
-      }
-      return functions;
-    }),
-    MatCardModule,
-    MatStepperModule,
-    MatButtonModule,
-    MatInputModule,
-    MatDividerModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatSlideToggleModule,
-    MatToolbarModule,
-    MatProgressSpinnerModule,
-    MatProgressBarModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        provideFirebaseApp(() => initializeApp(environment.firebase)),
+        provideFunctions(() => {
+            const functions = getFunctions();
+            if (!environment.production) {
+                connectFunctionsEmulator(functions, 'localhost', 5001);
+            }
+            return functions;
+        }),
+        MatCardModule,
+        MatStepperModule,
+        MatButtonModule,
+        MatInputModule,
+        MatDividerModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatSlideToggleModule,
+        MatToolbarModule,
+        MatProgressSpinnerModule,
+        MatProgressBarModule,
+        MatDialogModule
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

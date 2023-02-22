@@ -1,15 +1,17 @@
-import {Injectable, OnDestroy, OnInit} from '@angular/core';
+import {Injectable, OnDestroy} from '@angular/core';
 import {DonationLength} from "../../../functions/src/api-types";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfigService} from "./config.service";
-import {AsyncSubject, map, shareReplay, switchMap, takeUntil, tap} from "rxjs";
+import {AsyncSubject, filter, first, map, merge, shareReplay, switchMap, takeUntil, tap} from "rxjs";
+import {MatDialog} from "@angular/material/dialog";
+import {NoBrickDialogComponent} from "../no-brick-dialog/no-brick-dialog.component";
 
 @Injectable({
   providedIn: 'root'
 })
 export class DonationApplicationService implements OnDestroy {
   private readonly destroyed = new AsyncSubject()
-
+  private shownNoBrickDialog = false;
   private _showDonationLengths: false | DonationLength[] = false;
   get showDonationLengths() {return this._showDonationLengths}
   readonly donationLength = new FormControl<DonationLength>(DonationLength.FULL_RAMADAN)
@@ -35,10 +37,10 @@ export class DonationApplicationService implements OnDestroy {
   })
 
   constructor(
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly dialog: MatDialog
   ) {
     this.setup().subscribe()
-    // TODO: add popup warning about not being eligible for brick. only show popup once.
   }
 
   setup() {
@@ -47,6 +49,7 @@ export class DonationApplicationService implements OnDestroy {
         this.setupDonationLengths(data.donationLengths)
         this._showNoteAboutBackdating = this.showBackdatingNote(data.donationLengths, data.ramadanStartDate, data.last10Days)
         this.setupAmounts(data.presetAmounts, data.minimumAmount, data.targetAmount)
+        this.noBrickDialog(data.minimumAmount).subscribe()
       }),
       switchMap(() => this.setupOnBehalfOf()),
       shareReplay(1),
@@ -89,6 +92,19 @@ export class DonationApplicationService implements OnDestroy {
         if (this.donorInfo.controls.onBehalfOf.pristine) {
           this.donorInfo.controls.onBehalfOf.setValue(value);
         }
+      }),
+      takeUntil(this.destroyed)
+    )
+  }
+
+  private noBrickDialog(minimumAmount: number) {
+    return merge(
+      this.donationLength.valueChanges.pipe(filter(data => data !== null && data !== DonationLength.FULL_RAMADAN)),
+      this.donationAmount.valueChanges.pipe(filter(data => data !== null && data < minimumAmount))
+    ).pipe(
+      first(),
+      tap(() => {
+        this.dialog.open(NoBrickDialogComponent)
       }),
       takeUntil(this.destroyed)
     )
