@@ -19,6 +19,7 @@ import {FormControl} from "@angular/forms";
 export class SetupComponent implements OnInit, AfterViewInit {
   @ViewChild('stepper') private stepper!: MatStepper;
   @ViewChild('checkoutStep') private checkoutStep!: MatStep;
+  showCustomAmount = false
   get showDonationLengths() {
     return this.applicationService.showDonationLengths
   }

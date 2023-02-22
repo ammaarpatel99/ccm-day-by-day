@@ -23,22 +23,27 @@
           [class.firstBtn]="isFirst"
           (click)="setAmount(presetAmount)"
         >£{{presetAmount}} / day</button>
+        <button
+          mat-raised-button color="primary" *ngIf="!showCustomAmount"
+          (click)="showCustomAmount = true"
+        >Other Amount</button>
       </div>
-      <!-- TODO: add custom amount button -->
-      <mat-divider></mat-divider>
+      <mat-divider *ngIf="showCustomAmount"></mat-divider>
     </ng-container>
-    <div class="custom-amounts-container">
-      <mat-form-field floatLabel="always">
-        <mat-label>Custom Amount</mat-label>
-        <input matInput type="number" placeholder="0.00"  [formControl]="amount">
-        <span matTextPrefix>£&nbsp;</span>
-        <mat-error *ngIf="amount.invalid">{{errorMessage(amount)}}</mat-error>
-      </mat-form-field>
-    </div>
-    <div class="actions-container">
-      <button mat-stroked-button matStepperPrevious>BACK</button>
-      <button mat-stroked-button color="primary" matStepperNext [disabled]="!donationAmountComplete">NEXT</button>
-    </div>
+    <ng-container *ngIf="showCustomAmount || !showPresetAmounts">
+      <div class="custom-amounts-container">
+        <mat-form-field floatLabel="always">
+          <mat-label>Custom Amount</mat-label>
+          <input matInput type="number" placeholder="0.00"  [formControl]="amount">
+          <span matTextPrefix>£&nbsp;</span>
+          <span matTextSuffix=""> / day</span>
+          <mat-error *ngIf="amount.invalid">{{errorMessage(amount)}}</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="actions-container" id="custom-amount-btn-container">
+        <button mat-raised-button color="primary" matStepperNext [disabled]="!donationAmountComplete">NEXT</button>
+      </div>
+    </ng-container>
   </mat-step>
 
   <mat-step [editable]="canEdit" [completed]="!canEdit || donationDetailsComplete">
@@ -73,7 +78,7 @@
     </p>
     <mat-form-field>
       <mat-label>Name</mat-label>
-      <input matInput [formControl]="donorInfo.controls.onBehalfOf" placeholder="Donate on behalf of:">
+      <input matInput [formControl]="donorInfo.controls.onBehalfOf" placeholder="Donate on behalf of">
       <mat-error *ngIf="donorInfo.controls.onBehalfOf.invalid">{{errorMessage(donorInfo.controls.onBehalfOf)}}</mat-error>
     </mat-form-field>
     <p>If you do not wish the donation to be noted on our website and other media, please check the anonymous option.</p>
@@ -95,7 +100,7 @@
     </mat-slide-toggle>
     <div class="actions-container">
       <button mat-stroked-button matStepperPrevious>BACK</button>
-      <button mat-stroked-button color="primary" matStepperNext [disabled]="!donationDetailsComplete">NEXT</button>
+      <button mat-raised-button color="primary" matStepperNext [disabled]="!donationDetailsComplete">NEXT</button>
     </div>
   </mat-step>
 
@@ -133,7 +138,7 @@
       </p>
       <div class="actions-container">
         <button mat-stroked-button matStepperPrevious>BACK</button>
-        <button mat-stroked-button color="primary" (click)="setupPayment()">SETUP DONATION</button>
+        <button mat-raised-button color="primary" (click)="setupPayment()">SETUP DONATION</button>
       </div>
     </ng-container>
   </mat-step>
@@ -161,6 +166,6 @@
       <p>Gift Aid: <b>{{fullSummary.giftAid ? "Yes" : "No"}}</b></p>
     </ng-container>
 
-    <button mat-stroked-button color="primary" (click)="goToMainSite()">Return to Main Website</button>
+    <button mat-raised-button color="primary" (click)="goToMainSite()">Return to Main Website</button>
   </mat-step>
 </mat-stepper>

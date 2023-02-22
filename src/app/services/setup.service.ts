@@ -120,7 +120,6 @@ export class SetupService {
   completePaymentSetup(donationID: string, checkoutID: string) {
     this._checkoutState = CheckoutState.RE_ESTABLISHING
     this.checkoutData = {donationID, checkoutID}
-    console.log(this.checkoutData)
   }
 
   constructor(
