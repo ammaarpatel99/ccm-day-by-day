@@ -15,7 +15,7 @@ export class LoadingComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.donationApplicationService.setupWithConfig().subscribe(() => {
+    this.donationApplicationService.setup().subscribe(() => {
       this.router.navigate(['/', 'setup']);
     });
   }

@@ -2,7 +2,7 @@ import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {DonationLength} from "../../../functions/src/api-types";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfigService} from "./config.service";
-import {AsyncSubject, shareReplay, takeUntil, tap} from "rxjs";
+import {AsyncSubject, map, shareReplay, switchMap, takeUntil, tap} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -37,17 +37,18 @@ export class DonationApplicationService implements OnDestroy {
   constructor(
     private readonly configService: ConfigService
   ) {
-    this.setupWithConfig().subscribe()
+    this.setup().subscribe()
     // TODO: add popup warning about not being eligible for brick. only show popup once.
   }
 
-  setupWithConfig() {
+  setup() {
     return this.configService.config$.pipe(
       tap(data => {
         this.setupDonationLengths(data.donationLengths)
         this._showNoteAboutBackdating = this.showBackdatingNote(data.donationLengths, data.ramadanStartDate, data.last10Days)
         this.setupAmounts(data.presetAmounts, data.minimumAmount, data.targetAmount)
       }),
+      switchMap(() => this.setupOnBehalfOf()),
       shareReplay(1),
       takeUntil(this.destroyed)
     )
@@ -80,6 +81,17 @@ export class DonationApplicationService implements OnDestroy {
         Math.floor(control.value * 100) / 100 === control.value ? null
           : {invalidAmount: `Amount cannot have more than 2 decimal places.`}
     ])
+  }
+
+  private setupOnBehalfOf() {
+    return this.contactInfo.controls.name.valueChanges.pipe(
+      map(value => {
+        if (this.donorInfo.controls.onBehalfOf.pristine) {
+          this.donorInfo.controls.onBehalfOf.setValue(value);
+        }
+      }),
+      takeUntil(this.destroyed)
+    )
   }
 
   ngOnDestroy(): void {

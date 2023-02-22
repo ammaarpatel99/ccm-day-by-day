@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, Component, ViewChild} from '@angular/core';
 import {MatStep, MatStepper} from "@angular/material/stepper";
 import {DonationApplicationService} from "../services/donation-application.service";
 import {CheckoutState, SetupService} from "../services/setup.service";
@@ -16,7 +16,7 @@ import {FormControl} from "@angular/forms";
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.scss']
 })
-export class SetupComponent implements OnInit, AfterViewInit {
+export class SetupComponent implements AfterViewInit {
   @ViewChild('stepper') private stepper!: MatStepper;
   @ViewChild('checkoutStep') private checkoutStep!: MatStep;
   showCustomAmount = false
