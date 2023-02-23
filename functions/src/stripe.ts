@@ -2,11 +2,9 @@ import Stripe from "stripe";
 import {Application, ApplicationWithCustomer} from "./helpers";
 import {processSubscriptionInfo} from "./processSubscriptionInfo";
 
-// TODO: change stripe key to the live one
-// FIXME: roll stripe test key
-const stripeKey = "sk_test_51MOiitFg1jrvwujseQk1ciZYu1dmlmaamxe" +
-  "7kaW1jDsYwp59HtyBqKw6JsAxUEHVswfPvaI6XVpgVUYCC11kfVme00KC97UJxx";
-const stripeProduct = "prod_NPRoJ1nQPSgEbK";
+const stripeKey = "sk_live_51MOiitFg1jrvwujs2e2XNzPQlE04EGUKClacqFLfkkGgx" +
+  "lSxNHXHYXrVkmlUq7dRYFn8C4jlB9MApFcZLER0vbBD00QprYQEaj";
+const stripeProduct = "prod_NPVkEw65yq837V";
 const stripe = new Stripe(stripeKey, {apiVersion: "2022-11-15"});
 
 /**
