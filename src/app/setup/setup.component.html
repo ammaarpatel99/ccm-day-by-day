@@ -1,7 +1,10 @@
 <!-- TODO: Check all the text on this page -->
-<mat-stepper orientation="vertical" linear #stepper (selectionChange)="stepperSelectionChange($event.selectedIndex)">
+<mat-stepper
+  [orientation]="stepperVertical ? 'vertical' : 'horizontal'"
+  labelPosition="bottom" linear #stepper
+  (selectionChange)="stepperSelectionChange($event.selectedIndex)">
   <mat-step *ngIf="!!showDonationLengths" [editable]="canEdit" [completed]="!canEdit || donationLengthComplete">
-    <ng-template matStepLabel>How Long Would You Like To Donate For?</ng-template>
+    <ng-template matStepLabel>Donation Length</ng-template>
     <p *ngIf="showBackdatingNote">
       Note: If the period you select has already begun you will be charged a lump sum for the days you have missed,
       so you can make up those donations and inshallah still receive the reward.
@@ -14,7 +17,7 @@
   </mat-step>
 
   <mat-step [editable]="canEdit" [completed]="!canEdit || donationAmountComplete">
-    <ng-template matStepLabel>Choose Your Daily Amount</ng-template>
+    <ng-template matStepLabel>Daily Amount</ng-template>
     <ng-container *ngIf="!!showPresetAmounts">
       <div class="amounts-container">
         <button
@@ -50,24 +53,34 @@
     <ng-template matStepLabel>Details</ng-template>
     <h2>Contact Details:</h2>
     <mat-form-field>
-      <mat-label>Name</mat-label>
-      <input matInput placeholder="Your Name" [formControl]="contactInfo.controls.name">
-      <mat-error *ngIf="contactInfo.controls.name.invalid">{{errorMessage(contactInfo.controls.name)}}</mat-error>
+      <mat-label>First Name(s)</mat-label>
+      <input matInput placeholder="First Name(s)" [formControl]="donorInfo.controls.firstName">
+      <mat-error *ngIf="donorInfo.controls.firstName.invalid">{{errorMessage(donorInfo.controls.firstName)}}</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+    <mat-label>Surname</mat-label>
+    <input matInput placeholder="Surname" [formControl]="donorInfo.controls.surname">
+    <mat-error *ngIf="donorInfo.controls.surname.invalid">{{errorMessage(donorInfo.controls.surname)}}</mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Email</mat-label>
-      <input matInput placeholder="xxx@example.com" [formControl]="contactInfo.controls.email">
-      <mat-error *ngIf="contactInfo.controls.email.invalid">{{errorMessage(contactInfo.controls.email)}}</mat-error>
+      <input matInput placeholder="xxx@example.com" [formControl]="donorInfo.controls.email">
+      <mat-error *ngIf="donorInfo.controls.email.invalid">{{errorMessage(donorInfo.controls.email)}}</mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Phone Number</mat-label>
-      <input matInput placeholder="+XX XXXX XXXXXX" [formControl]="contactInfo.controls.phone">
-      <mat-error *ngIf="contactInfo.controls.phone.invalid">{{errorMessage(contactInfo.controls.phone)}}</mat-error>
+      <input matInput placeholder="+XX XXXX XXXXXX" [formControl]="donorInfo.controls.phone">
+      <mat-error *ngIf="donorInfo.controls.phone.invalid">{{errorMessage(donorInfo.controls.phone)}}</mat-error>
     </mat-form-field>
     <mat-form-field>
-      <mat-label>Address (including Post Code)</mat-label>
-      <input matInput placeholder="309-313 Mill Rd, Cambridge, CB1 3DF, UK" [formControl]="contactInfo.controls.address">
-      <mat-error *ngIf="contactInfo.controls.address.invalid">{{errorMessage(contactInfo.controls.address)}}</mat-error>
+      <mat-label>Address</mat-label>
+      <input matInput placeholder="309-313 Mill Rd, Cambridge, UK" [formControl]="donorInfo.controls.address">
+      <mat-error *ngIf="donorInfo.controls.address.invalid">{{errorMessage(donorInfo.controls.address)}}</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+    <mat-label>Post Code</mat-label>
+    <input matInput placeholder="CB1 3DF" [formControl]="donorInfo.controls.postcode">
+    <mat-error *ngIf="donorInfo.controls.postcode.invalid">{{errorMessage(donorInfo.controls.postcode)}}</mat-error>
     </mat-form-field>
     <h2>Donate on behalf of:</h2>
     <h3>(Can be yourself or someone else)</h3>
@@ -78,21 +91,17 @@
     </p>
     <mat-form-field>
       <mat-label>Name</mat-label>
-      <input matInput [formControl]="donorInfo.controls.onBehalfOf" placeholder="Donate on behalf of">
-      <mat-error *ngIf="donorInfo.controls.onBehalfOf.invalid">{{errorMessage(donorInfo.controls.onBehalfOf)}}</mat-error>
+      <input matInput [formControl]="donationInfo.controls.onBehalfOf" placeholder="Donate on behalf of">
+      <mat-error *ngIf="donationInfo.controls.onBehalfOf.invalid">{{errorMessage(donationInfo.controls.onBehalfOf)}}</mat-error>
     </mat-form-field>
-    <p>If you do not wish the donation to be noted on our website and other media, please check the anonymous option.</p>
-    <mat-slide-toggle color="primary" [formControl]="donorInfo.controls.anonymous">Anonymous</mat-slide-toggle>
+    <p>If you do not wish the name to be noted on our website and other media, please check the anonymous option.</p>
+    <mat-slide-toggle color="primary" [formControl]="donationInfo.controls.anonymous">Anonymous</mat-slide-toggle>
     <h2>Consent</h2>
     <h4>Gift Aid</h4>
-    <p>
-      If you are a UK taxpayer and are eligible for Gift Aid, you may select the below option.
-      If you do we will get in touch regarding registering your Day By Day donation for Gift Aid, which will result
-      in the <b>government contributing an additional 25%</b> to your donation.
-    </p>
-    <mat-slide-toggle [formControl]="consent.controls.giftAid" color="primary">Consent to Gift Aid</mat-slide-toggle>
+    <p [innerHTML]="giftAidDisclaimer"></p>
+    <mat-slide-toggle [formControl]="donorInfo.controls.giftAid" color="primary">Consent to Gift Aid</mat-slide-toggle>
     <h4>Disclaimer</h4>
-    <p *ngFor="let line of disclaimer">{{line}}</p>
+    <p [innerHTML]="disclaimer"></p>
     <mat-slide-toggle [formControl]="consent.controls.disclaimer" color="primary">Accept the disclaimer</mat-slide-toggle>
     <h4>Data and Privacy Policy</h4>
     <mat-slide-toggle [formControl]="consent.controls.privacy" color="primary">
@@ -105,7 +114,7 @@
   </mat-step>
 
   <mat-step [editable]="checkoutState !== checkoutStates.COMPLETE" [completed]="checkoutState === checkoutStates.COMPLETE" #checkoutStep>
-    <ng-template matStepLabel>Setup Your Donation</ng-template>
+    <ng-template matStepLabel>Setup</ng-template>
     <div class="loading-container">
       <mat-progress-bar
         *ngIf="checkoutLoadingState.show"
@@ -123,10 +132,12 @@
       <p>On behalf of: <b>{{checkoutSummary.onBehalfOf}}</b></p>
       <p>Anonymous: <b>{{checkoutSummary.anonymous}}</b></p>
       <br/>
-      <p>Name: <b>{{checkoutSummary.name}}</b></p>
+      <p>First Name: <b>{{checkoutSummary.firstName}}</b></p>
+      <p>Surname: <b>{{checkoutSummary.surname}}</b></p>
       <p>Email: <b>{{checkoutSummary.email}}</b></p>
       <p>Phone Number: <b>{{checkoutSummary.phone}}</b></p>
       <p>Address: <b>{{checkoutSummary.address}}</b></p>
+      <p>Postcode: <b>{{checkoutSummary.postcode}}</b></p>
       <p>Gift Aid: <b>{{checkoutSummary.giftAid ? "Yes" : "No"}}</b></p>
     </ng-container>
     <ng-container *ngIf="checkoutState === checkoutStates.NOT_BEGUN">
@@ -159,11 +170,15 @@
       <p>On behalf of: <b>{{fullSummary.onBehalfOf}}</b></p>
       <p>Anonymous: <b>{{fullSummary.anonymous}}</b></p>
       <br/>
-      <p>Name: <b>{{fullSummary.name}}</b></p>
+      <p>First Name: <b>{{fullSummary.firstName}}</b></p>
+      <p>Surname: <b>{{fullSummary.surname}}</b></p>
       <p>Email: <b>{{fullSummary.email}}</b></p>
       <p>Phone Number: <b>{{fullSummary.phone}}</b></p>
       <p>Address: <b>{{fullSummary.address}}</b></p>
+      <p>Postcode: <b>{{fullSummary.postcode}}</b></p>
+      <br/>
       <p>Gift Aid: <b>{{fullSummary.giftAid ? "Yes" : "No"}}</b></p>
+      <p>Date of consent to Gift Aid: <b>{{numberToDate(fullSummary.giftAidConsentDate) | date:"dd/MM/yyyy"}}</b></p>
     </ng-container>
 
     <button mat-raised-button color="primary" (click)="goToMainSite()">Return to Main Website</button>

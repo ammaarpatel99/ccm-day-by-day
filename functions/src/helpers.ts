@@ -15,12 +15,15 @@ interface BaseApplication {
   donationLength: DonationLength;
   amount: number;
   onBehalfOf: string;
-  name: string;
+  firstName: string;
+  surname: string;
   email: string;
   phone: string;
   address: string;
+  postcode: string;
   anonymous: boolean;
   giftAid: boolean;
+  giftAidConsentDate: number;
 }
 export interface Application extends BaseApplication {
   status: "application";

@@ -2,7 +2,7 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {DonationLength} from "../../../functions/src/api-types";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfigService} from "./config.service";
-import {AsyncSubject, filter, first, map, merge, shareReplay, switchMap, takeUntil, tap} from "rxjs";
+import {AsyncSubject, combineLatest, filter, first, map, merge, shareReplay, switchMap, takeUntil, tap} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
 import {NoBrickDialogComponent} from "../no-brick-dialog/no-brick-dialog.component";
 
@@ -20,18 +20,20 @@ export class DonationApplicationService implements OnDestroy {
   private _showPresetAmounts: false | number[] = false
   get showPresetAmounts() {return this._showPresetAmounts}
   readonly donationAmount = new FormControl(0)
-  readonly donorInfo = new FormGroup({
+  readonly donationInfo = new FormGroup({
     onBehalfOf: new FormControl("", [Validators.maxLength(25)]),
     anonymous: new FormControl(false, Validators.required)
   })
-  readonly contactInfo = new FormGroup({
-    name: new FormControl("", Validators.required),
+  readonly donorInfo = new FormGroup({
+    firstName: new FormControl("", Validators.required),
+    surname: new FormControl("", Validators.required),
     email: new FormControl("", [Validators.required, Validators.email]),
     phone: new FormControl("", Validators.required),
-    address: new FormControl("", Validators.required)
+    address: new FormControl("", Validators.required),
+    postcode: new FormControl("", Validators.required),
+    giftAid: new FormControl(false, Validators.required)
   })
   readonly consent = new FormGroup({
-    giftAid: new FormControl(false, Validators.required),
     privacy: new FormControl(false, [Validators.required, Validators.requiredTrue]),
     disclaimer: new FormControl(false, [Validators.required, Validators.requiredTrue])
   })
@@ -50,8 +52,8 @@ export class DonationApplicationService implements OnDestroy {
         this._showNoteAboutBackdating = this.showBackdatingNote(data.donationLengths, data.ramadanStartDate, data.last10Days)
         this.setupAmounts(data.presetAmounts, data.minimumAmount, data.targetAmount)
         this.noBrickDialog(data.minimumAmount).subscribe()
+        this.setupOnBehalfOf().subscribe()
       }),
-      switchMap(() => this.setupOnBehalfOf()),
       shareReplay(1),
       takeUntil(this.destroyed)
     )
@@ -87,10 +89,13 @@ export class DonationApplicationService implements OnDestroy {
   }
 
   private setupOnBehalfOf() {
-    return this.contactInfo.controls.name.valueChanges.pipe(
-      map(value => {
-        if (this.donorInfo.controls.onBehalfOf.pristine) {
-          this.donorInfo.controls.onBehalfOf.setValue(value);
+    return combineLatest([
+      this.donorInfo.controls.firstName.valueChanges,
+      this.donorInfo.controls.surname.valueChanges
+    ]).pipe(
+      map(([firstName, surname]) => {
+        if (this.donationInfo.controls.onBehalfOf.pristine) {
+          this.donationInfo.controls.onBehalfOf.setValue(`${firstName} ${surname}`);
         }
       }),
       takeUntil(this.destroyed)

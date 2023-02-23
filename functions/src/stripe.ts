@@ -6,16 +6,21 @@ import {processSubscriptionInfo} from "./processSubscriptionInfo";
 // FIXME: roll stripe test key
 const stripeKey = "sk_test_51MOiitFg1jrvwujseQk1ciZYu1dmlmaamxe" +
   "7kaW1jDsYwp59HtyBqKw6JsAxUEHVswfPvaI6XVpgVUYCC11kfVme00KC97UJxx";
-const stripeProduct = "prod_NOPh6gURBdjBwE";
+const stripeProduct = "prod_NPRoJ1nQPSgEbK";
 const stripe = new Stripe(stripeKey, {apiVersion: "2022-11-15"});
 
 /**
  * Make a customer on Stripe
  * @return {string} The customer ID
  */
-export async function makeCustomer({email, name, phone, address}: Application) {
+export async function makeCustomer({
+  email, firstName, surname, phone, address, postcode,
+  giftAid, giftAidConsentDate,
+}: Application) {
   const customer = await stripe.customers.create({
-    email, name, phone, metadata: {address},
+    email, name: `${firstName} ${surname}`, phone,
+    address: {line1: address, postal_code: postcode},
+    metadata: {giftAid: giftAid ? "Yes" : "No", giftAidConsentDate},
   });
   return customer.id;
 }
@@ -84,7 +89,6 @@ export async function createSubscriptionSchedule(
       metadata: {
         onBehalfOf: data.onBehalfOf,
         anonymous: JSON.stringify(data.anonymous),
-        giftAid: JSON.stringify(data.giftAid),
         donationID: donationID,
       },
     }],

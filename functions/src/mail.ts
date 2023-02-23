@@ -38,7 +38,6 @@ export async function sendConfirmationEmail(
         "<br/><br/>";
     }
   }
-  // TODO: add Gift Aid form
   return await transporter.sendMail({
     to: data.email,
     from: "CCM Day By Day<daybyday@cambridgecentralmosque.org>",
@@ -49,24 +48,38 @@ export async function sendConfirmationEmail(
 <br/>${brickTxt}
 Thank you for setting up your donation to Cambridge Central Mosque for
 Ramadan 2023 through our Day By Day scheme. You should receive invoices
-when the donations start. The details of your donation are below:<br/>
+when the donations start.<br/>
 <br/>
-ID: ${donationID}<br/>
-Amount: ${data.amount}<br/>
-Start Date: ${new Date(data.startDate).toLocaleDateString()}<br/>
-Days: ${data.iterations}<br/>
-Initiated: ${new Date(data.created).toLocaleDateString()}<br/>
+<h3>Donation Details:</h3>
+Reference: <em>${donationID}</em><br/>
+Amount: <em>${data.amount}</em><br/>
+Start Date: <em>${new Date(data.startDate).toLocaleDateString("en-UK")}
+</em><br/>
+Days: <em>${data.iterations}</em><br/>
+Initiated: <em>${new Date(data.created).toLocaleDateString("en-UK")}</em><br/>
 <br/>
-On Behalf of: ${data.onBehalfOf}<br/>
-Anonymous: ${data.anonymous ? "Yes" : "No"}<br/>
+On Behalf of: <em>${data.onBehalfOf}</em><br/>
+Anonymous: <em>${data.anonymous ? "Yes" : "No"}</em><br/>
 <br/>
-Name: ${data.name}Email: ${data.email}<br/>
-Phone Number: ${data.phone}<br/>
-Address: ${data.address}<br/>
-Gift Aid: ${data.giftAid ? "Yes" : "No"}<br/>
+<h3>Donor Details:</h3>
+Name: <em>${data.firstName} ${data.surname}</em><br/>
+Email: <em>${data.email}</em><br/>
+Phone Number: <em>${data.phone}</em><br/>
+Address: <em>${data.address}</em><br/>
+Postcode: <em>${data.postcode}</em><br/>
 <br/>
-Disclaimer:<br/>
-${config.disclaimer.replace("\n", "<br/>")}<br/>
+<h3>Gift Aid:</h3>
+Consent to Gift Aid: <em>${data.giftAid ? "Yes" : "No"}</em><br/>
+${!data.giftAid ? "" : `
+Date of consent:
+<em>${new Date(data.giftAidConsentDate).toLocaleDateString("en-UK")}</em>
+<br/>
+<h4>Gift Aid Disclaimer:</h4>
+${config.giftAidDisclaimer}${config.giftAidUpdatesDisclaimer}<br/>
+`}
+<br/>
+<h3>Day By Day Disclaimer:</h3>
+${config.disclaimer}<br/>
 <br/>
 <br/>
 Best wishes,<br/>

@@ -1,25 +1,28 @@
-import {AfterViewChecked, AfterViewInit, Component, ViewChild} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, Component, OnDestroy, ViewChild} from '@angular/core';
 import {MatStep, MatStepper} from "@angular/material/stepper";
 import {DonationApplicationService} from "../services/donation-application.service";
 import {CheckoutState, SetupService} from "../services/setup.service";
 import {DonationLength} from "../../../functions/src/api-types";
 import {ConfigService} from "../services/config.service";
-import {map, switchMap, take, tap} from "rxjs";
+import {AsyncSubject, map, switchMap, take, takeUntil, tap} from "rxjs";
 import {
   ApplicationSummary,
   SubscriptionSummary
 } from "../../../functions/src/helpers";
 import {FormControl} from "@angular/forms";
+import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
 
 @Component({
   selector: 'app-setup',
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.scss']
 })
-export class SetupComponent implements AfterViewInit {
+export class SetupComponent implements AfterViewInit, OnDestroy {
   @ViewChild('stepper') private stepper!: MatStepper;
   @ViewChild('checkoutStep') private checkoutStep!: MatStep;
   showCustomAmount = false
+  stepperVertical = true
+  private readonly destroyed = new AsyncSubject()
   get showDonationLengths() {
     return this.applicationService.showDonationLengths
   }
@@ -35,11 +38,11 @@ export class SetupComponent implements AfterViewInit {
   get donationLength() {
     return this.applicationService.donationLength
   }
+  get donationInfo() {
+    return this.applicationService.donationInfo
+  }
   get donorInfo() {
     return this.applicationService.donorInfo
-  }
-  get contactInfo() {
-    return this.applicationService.contactInfo
   }
   get consent() {
     return this.applicationService.consent
@@ -58,7 +61,8 @@ export class SetupComponent implements AfterViewInit {
   get canEdit() {
     return this.checkoutState === this.checkoutStates.NOT_BEGUN
   }
-  disclaimer: string[] = [];
+  disclaimer = "";
+  giftAidDisclaimer = "";
 
   get donationLengthComplete() {
     return !this.showDonationLengths || (this.donationLength.valid && this.donationLength.dirty)
@@ -67,7 +71,7 @@ export class SetupComponent implements AfterViewInit {
     return this.amount.valid && this.amount.dirty
   }
   get donationDetailsComplete() {
-    return this.donorInfo.valid && this.contactInfo.valid && this.consent.valid
+    return this.donationInfo.valid && this.donorInfo.valid && this.consent.valid
   }
 
   private _checkoutLoadingState: {
@@ -149,15 +153,25 @@ export class SetupComponent implements AfterViewInit {
   constructor(
     private readonly applicationService: DonationApplicationService,
     private readonly setupService: SetupService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly breakpointObserver: BreakpointObserver
   ) {
   }
 
   ngOnInit(): void {
-    this.configService.config$.pipe(
-      map(data => data.disclaimer.split('\n')),
-      take(1)
-    ).subscribe(data => this.disclaimer = data)
+    this.configSetup()
+    this.handlePostPaymentSetup()
+    this.observeBreakpoints()
+  }
+
+  private configSetup() {
+    this.configService.config$.subscribe(data => {
+      this.disclaimer = data.disclaimer;
+      this.giftAidDisclaimer = data.giftAidDisclaimer;
+    })
+  }
+
+  private handlePostPaymentSetup() {
     if (this.checkoutState === CheckoutState.RE_ESTABLISHING) {
       this._checkoutLoadingState = {show: true, mode: "indeterminate", value: 0}
       this.setupService.getCheckoutSummary().pipe(
@@ -181,9 +195,22 @@ export class SetupComponent implements AfterViewInit {
     }
   }
 
+  private observeBreakpoints() {
+    this.breakpointObserver.observe(Breakpoints.XSmall).pipe(
+      takeUntil(this.destroyed)
+    ).subscribe(data => {
+      this.stepperVertical = !data.matches
+    })
+  }
+
   ngAfterViewInit(): void {
     if (this.checkoutState === CheckoutState.RE_ESTABLISHING) {
       this.checkoutStep.select()
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next(true)
+    this.destroyed.complete()
   }
 }
