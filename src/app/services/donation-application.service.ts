@@ -103,13 +103,17 @@ export class DonationApplicationService implements OnDestroy {
   }
 
   private noBrickDialog(minimumAmount: number) {
+    let done = 0;
     return merge(
       this.donationLength.valueChanges.pipe(filter(data => data !== null && data !== DonationLength.FULL_RAMADAN)),
       this.donationAmount.valueChanges.pipe(filter(data => data !== null && data < minimumAmount))
     ).pipe(
       first(),
       tap(() => {
-        this.dialog.open(NoBrickDialogComponent)
+        done++;
+        if (done === 1) {
+          this.dialog.open(NoBrickDialogComponent)
+        }
       }),
       takeUntil(this.destroyed)
     )

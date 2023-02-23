@@ -115,7 +115,10 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
   }
 
   stepperSelectionChange(index: number) {
-    if (this.showDonationLengths === false ? index === 2 : index === 3) {
+    if (
+      (this.showDonationLengths === false ? index === 2 : index === 3) &&
+      this.checkoutState !== CheckoutState.RE_ESTABLISHING
+    ) {
       this._checkoutSummary = null
       this._checkoutLoadingState = {show: true, mode: 'query', value: 0}
       this.setupService.getPreCheckoutSummary().subscribe(data => {
