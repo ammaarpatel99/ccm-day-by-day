@@ -38,7 +38,6 @@ export async function createSetupSession(
   customerID: string, successURL: string
 ) {
   const session = await stripe.checkout.sessions.create({
-    // TODO: review payment method types accepted
     payment_method_types: ["card", "bacs_debit", "sepa_debit"],
     mode: "setup",
     success_url: `${successURL}/{CHECKOUT_SESSION_ID}`,
