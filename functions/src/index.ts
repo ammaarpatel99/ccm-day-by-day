@@ -34,10 +34,10 @@ export const setupPayment = functions.https.onCall(
     const customerID = await makeCustomer(data);
     const _data: Omit<typeof data, "successURL"> & {successURL?: string} =
       {...data};
-    const docData: ApplicationWithCustomer = {
-      ...data, status: "application_with_customer", customerID,
-    };
     delete _data.successURL;
+    const docData: ApplicationWithCustomer = {
+      ..._data, status: "application_with_customer", customerID,
+    };
     const doc = await db.donations.add(docData);
     const applicationID = doc.id;
     const setupURL = await createSetupSession(
