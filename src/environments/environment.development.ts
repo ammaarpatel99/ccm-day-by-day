@@ -1,12 +1,12 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "AIzaSyAIqDd0vd6GSz7HHxgN1fmUx42ukSPuuVQ",
-    authDomain: "day-by-day-dfa7c.firebaseapp.com",
-    projectId: "day-by-day-dfa7c",
-    storageBucket: "day-by-day-dfa7c.appspot.com",
-    messagingSenderId: "1018393393870",
-    appId: "1:1018393393870:web:68c6be8eb1e5549e252e9f",
-    measurementId: "G-YQ079XQDW9"
+    projectId: 'day-by-day-c4787',
+    appId: '1:956311439076:web:78b86c8d688cccf55e4ef1',
+    storageBucket: 'day-by-day-c4787.appspot.com',
+    apiKey: 'AIzaSyCW2H0kQVKVB5PbdIedVWQ5IAjpqyb6cyA',
+    authDomain: 'day-by-day-c4787.firebaseapp.com',
+    messagingSenderId: '956311439076',
+    measurementId: 'G-E0R2QJYH4Q',
   }
 };

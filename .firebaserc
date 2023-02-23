@@ -1,5 +1,14 @@
 {
   "projects": {
-    "default": "day-by-day-dfa7c"
+    "default": "day-by-day-c4787"
+  },
+  "targets": {
+    "day-by-day-c4787": {
+      "hosting": {
+        "ccm-day-by-day": [
+          "day-by-day-c4787"
+        ]
+      }
+    }
   }
 }

@@ -103,6 +103,16 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "ccm-day-by-day:build:production",
+            "firebaseProject": "day-by-day-c4787",
+            "firebaseHostingSite": "day-by-day-c4787"
+          }
         }
       }
     }
