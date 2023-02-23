@@ -30,8 +30,8 @@ If you did not select the “Anonymous” option, you consent to the name entere
 under “Donate on Behalf of” being published on our Digital Wall, website,
 social media & elsewhere, all of which will be accessible to members of the
 public via the internet.<br/><br/>
-<em>[Please note: The Cambridge Mosque Trust reserves the right to change the terms
-of issuing this gift at its own discretion, and without advance notice.
+<em>[Please note: The Cambridge Mosque Trust reserves the right to change the
+terms of issuing this gift at its own discretion, and without advance notice.
 Thank you for your understanding.]</em>
 `;
 
