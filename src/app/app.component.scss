@@ -1,25 +1,36 @@
-.XLarge, .Large {
+mat-card.XLarge, mat-card.Large {
   margin: 20%;
   margin-top: 5%;
   margin-bottom: 5%;
 }
 
-.Medium {
+mat-card.Medium {
   margin: 15%;
   margin-top: 5%;
   margin-bottom: 5%;
 }
 
-.Small {
+mat-card.Small {
   margin: 10%;
   margin-top: 5%;
   margin-bottom: 5%;
 }
 
-.XSmall {
+mat-card.XSmall {
   margin: 0;
+}
+
+mat-toolbar.XSmall {
+  justify-content: center;
 }
 
 mat-card-footer {
   padding: 0 1em;
+  p {
+    text-align: center;
+  }
+}
+
+mat-toolbar {
+  padding: 2.5em;
 }

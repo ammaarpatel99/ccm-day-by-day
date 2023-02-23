@@ -1,25 +1,26 @@
-<!--<mat-toolbar>-->
-<!--  <img src="assets/CCM%20Full%20Logo.png">-->
-<!--</mat-toolbar>-->
+<mat-toolbar [class]="currentScreenSize">
+  <img src="assets/CCM%20Full%20Logo.png">
+</mat-toolbar>
 
 <mat-card [class]="currentScreenSize">
   <mat-card-header>
-    <img mat-card-avatar src="assets/CCM%20Logo%20-%20no%20words.jpeg">
+    <img mat-card-avatar src="assets/CCM%20Logo%20-%20no%20words.jpeg" *ngIf="currentScreenSize === 'XSmall'">
     <mat-card-title>
-      CCM Ramadan - Day By Day 2023
+      Ramadan Donations
     </mat-card-title>
     <mat-card-subtitle>
-      Setup Your Daily Donation
+      Day By Day Setup
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     <router-outlet></router-outlet>
   </mat-card-content>
   <mat-card-footer>
-    <h4>
-      If you have any difficulties, please contact
+    <p>
+      If you have any difficulties or questions, please contact
       <a href="mailto:daybyday@cambridgecentralmosque.org" target="_blank" rel="noopener noreferer">daybyday@cambridgecentralmosque.org</a>,
-      or call us on <a href="tel:01223654020">01223 654 020</a> (ex.0).
-    </h4>
+      and we will endeavour to respond as soon as possible. Thank you for supporting Cambridge Central Mosque.<br/>
+      ©The Cambridge Mosque Trust | Registered UK Charity No. 1164931
+    </p>
   </mat-card-footer>
 </mat-card>

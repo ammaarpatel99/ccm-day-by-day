@@ -19,20 +19,27 @@ const targetAmount = 30;
 
 const brickLimit = 300;
 
-const disclaimer = `All money given to the Cambridge Central Mosque (CCM)
-through this scheme is a donation to the Cambridge Mosque Trust (CMT) which
-manages CCM.<br/>
-Out of those who complete the full Day By Day scheme (£30/day for 30 days
-during Ramadan), the first 300 will be offered the gift of a framed brick at
-a ceremony to take place at CCM.<br/>
-If you did not select the anonymous option, you consent to your name being used
-publicly in a list of donors (such as on a digital wall).`;
+const disclaimer = `All money given to the Cambridge Central Mosque
+through this scheme is a donation to the Registered UK Charity 1164931
+“The Cambridge Mosque Trust”.<br/><br/>
+If you are among the first 300 to set up donations of at least £30 for the
+full 30 days of Ramadan, you will be offered a framed brick with the option
+to receive it at a ceremony held in Cambridge; details TBC. This includes
+those commencing.<br/><br/>
+If you did not select the “Anonymous” option, you consent to the name entered
+under “Donate on Behalf of” being published on our Digital Wall, website,
+social media & elsewhere, all of which will be accessible to members of the
+public via the internet.<br/><br/>
+<em>[Please note: The Cambridge Mosque Trust reserves the right to change the terms
+of issuing this gift at its own discretion, and without advance notice.
+Thank you for your understanding.]</em>
+`;
 
 const giftAidDisclaimer = `I am a UK taxpayer. I want The
-Cambridge Mosque Trust <i>(registered UK charity number: 1164931)</i> to treat
+Cambridge Mosque Trust <i>(Registered UK Charity 1164931)</i> to treat
 all gifts of money that I have made in the past four years, and all future
 gifts of money that I make from the date of this declaration, as Gift Aid
-donations.<br/>
+donations.<br/><br/>
 I understand that if I pay less Income Tax and/or Capital Gains Tax than the
 amount of Gift Aid claimed on all my donations in that tax year it is my
 responsibility to pay any difference.`;
@@ -45,7 +52,7 @@ Please notify The Cambridge Mosque Trust if you:
 <li>no longer pay sufficient tax on your income and/or capital gains</li>
 </ul>
 If you pay Income Tax at the higher or additional rate and want to receive
-the additional tax reliefdue to you, you must include all your Gift Aid
+the additional tax relief due to you, you must include all your Gift Aid
 donations on your Self-Assessment tax return or ask HM Revenue and Customs to
 adjust your tax code.`;
 

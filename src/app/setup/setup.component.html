@@ -6,8 +6,7 @@
   <mat-step *ngIf="!!showDonationLengths" [editable]="canEdit" [completed]="!canEdit || donationLengthComplete">
     <ng-template matStepLabel>Donation Length</ng-template>
     <p *ngIf="showBackdatingNote">
-      Note: If the period you select has already begun you will be charged a lump sum for the days you have missed,
-      so you can make up those donations and inshallah still receive the reward.
+      Daily Ramadan donations will begin immediately, while donations for missed days will be calculated and collected automatically.
     </p>
     <button
       mat-raised-button color="primary"
@@ -17,7 +16,8 @@
   </mat-step>
 
   <mat-step [editable]="canEdit" [completed]="!canEdit || donationAmountComplete">
-    <ng-template matStepLabel>Daily Amount</ng-template>
+    <ng-template matStepLabel *ngIf="stepperVertical">Daily Amount</ng-template>
+    <h1 *ngIf="!stepperVertical">Daily Amount</h1>
     <ng-container *ngIf="!!showPresetAmounts">
       <div class="amounts-container">
         <button
@@ -36,7 +36,7 @@
     <ng-container *ngIf="showCustomAmount || !showPresetAmounts">
       <div class="custom-amounts-container">
         <mat-form-field floatLabel="always">
-          <mat-label>Custom Amount</mat-label>
+          <mat-label>Other Amount</mat-label>
           <input matInput type="number" placeholder="0.00"  [formControl]="amount">
           <span matTextPrefix>£&nbsp;</span>
           <span matTextSuffix="">/day</span>
@@ -50,7 +50,8 @@
   </mat-step>
 
   <mat-step [editable]="canEdit" [completed]="!canEdit || donationDetailsComplete">
-    <ng-template matStepLabel>Details</ng-template>
+    <ng-template matStepLabel *ngIf="stepperVertical">Details</ng-template>
+    <h1 *ngIf="!stepperVertical">Details</h1>
     <h2>Contact Details:</h2>
     <mat-form-field>
       <mat-label>First Name(s)</mat-label>
@@ -84,37 +85,50 @@
     </mat-form-field>
     <h2>Donate on behalf of:</h2>
     <h3>(Can be yourself or someone else)</h3>
+    <img src="https://cambridgecentralmosque.org/wp-content/uploads/2023/02/ccm_daybyday_framedbrick1.jpg">
     <p>
-      If you are gifted a framed brick, this name will be on the plaque.
-      If you are listed on the digital wall of donors, this name will be on the wall.<br/>
-      Max 25 characters.
+      If you are among the first 300 to set up donations of at least £30 for the full 30 days of Ramadan,
+      the name you enter here will be engraved on the plaque affixed to the framed brick,
+      from the original build of Cambridge Central Mosque, that you will be gifted.
+      This name will also be featured on our Digital Wall.<br/>
+      <em>[Maximum 25 characters]</em>
     </p>
     <mat-form-field>
       <mat-label>Name</mat-label>
-      <input matInput [formControl]="donationInfo.controls.onBehalfOf" placeholder="Donate on behalf of">
+      <input matInput [formControl]="donationInfo.controls.onBehalfOf" placeholder="Donate on Behalf of">
       <mat-error *ngIf="donationInfo.controls.onBehalfOf.invalid">{{errorMessage(donationInfo.controls.onBehalfOf)}}</mat-error>
     </mat-form-field>
-    <p>If you do not wish the name to be noted on our website and other media, please check the anonymous option.</p>
+    <p>If you have donated at least £30 for the full 30 days of Ramadan and wish to remain anonymous,
+      check the option below to avoid being published on our Digital Wall.</p>
     <mat-slide-toggle color="primary" [formControl]="donationInfo.controls.anonymous">Anonymous</mat-slide-toggle>
-    <h2>Consent</h2>
-    <h4>Gift Aid</h4>
-    <p [innerHTML]="giftAidDisclaimer"></p>
-    <mat-slide-toggle [formControl]="donorInfo.controls.giftAid" color="primary">Consent to Gift Aid</mat-slide-toggle>
-    <h4>Disclaimer</h4>
-    <p [innerHTML]="disclaimer"></p>
-    <mat-slide-toggle [formControl]="consent.controls.disclaimer" color="primary">Accept the disclaimer</mat-slide-toggle>
-    <h4>Data and Privacy Policy</h4>
-    <mat-slide-toggle [formControl]="consent.controls.privacy" color="primary">
-      Accept our <a href="https://cambridgecentralmosque.org/legal/" target="_blank" rel="noopener noreferer">Data & Privacy Policy</a>
-    </mat-slide-toggle>
     <div class="actions-container">
       <button mat-stroked-button matStepperPrevious>BACK</button>
       <button mat-raised-button color="primary" matStepperNext [disabled]="!donationDetailsComplete">NEXT</button>
     </div>
   </mat-step>
 
+  <mat-step [editable]="canEdit" [completed]="!canEdit || consentComplete">
+    <ng-template matStepLabel *ngIf="stepperVertical">Consent</ng-template>
+    <h1 *ngIf="!stepperVertical">Consent</h1>
+    <h4>Disclaimer</h4>
+    <p [innerHTML]="disclaimer"></p>
+    <mat-slide-toggle [formControl]="consent.controls.disclaimer" color="primary">I have read, understood, and accepted the above disclaimer.</mat-slide-toggle>
+    <h4>Data and Privacy Policy</h4>
+    <mat-slide-toggle [formControl]="consent.controls.privacy" color="primary">
+      Accept our <a href="https://cambridgecentralmosque.org/legal/" target="_blank" rel="noopener noreferer">Data & Privacy Policy</a>
+    </mat-slide-toggle>
+    <h4>Gift Aid (Optional)</h4>
+    <p [innerHTML]="giftAidDisclaimer"></p>
+    <mat-slide-toggle [formControl]="consent.controls.giftAid" color="primary">Consent to Gift Aid</mat-slide-toggle>
+    <div class="actions-container">
+      <button mat-stroked-button matStepperPrevious>BACK</button>
+      <button mat-raised-button color="primary" matStepperNext [disabled]="!consentComplete">NEXT</button>
+    </div>
+  </mat-step>
+
   <mat-step [editable]="checkoutState !== checkoutStates.COMPLETE" [completed]="checkoutState === checkoutStates.COMPLETE" #checkoutStep>
-    <ng-template matStepLabel>Setup</ng-template>
+    <ng-template matStepLabel *ngIf="stepperVertical">Payment</ng-template>
+    <h1 *ngIf="!stepperVertical">Payment</h1>
     <div class="loading-container">
       <mat-progress-bar
         *ngIf="checkoutLoadingState.show"
@@ -124,52 +138,66 @@
       ></mat-progress-bar>
     </div>
     <ng-container *ngIf="checkoutSummary != null">
-      <h2>Summary:</h2>
+      <h2>Summary</h2>
+      <h3>Donation Details:</h3>
       <p>Daily Amount: <b>{{checkoutSummary.amount | currency:"GBP"}} / day</b></p>
       <p>Start Date: <b>{{numberToDate(checkoutSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
       <p>Duration: <b>{{checkoutSummary.iterations}} days</b></p>
-      <br/>
       <p>On behalf of: <b>{{checkoutSummary.onBehalfOf}}</b></p>
-      <p>Anonymous: <b>{{checkoutSummary.anonymous}}</b></p>
-      <br/>
+      <p>Anonymous: <b>{{checkoutSummary.anonymous ? "Yes" : "No"}}</b></p>
+      <h3>Your Details:</h3>
       <p>First Name: <b>{{checkoutSummary.firstName}}</b></p>
       <p>Surname: <b>{{checkoutSummary.surname}}</b></p>
       <p>Email: <b>{{checkoutSummary.email}}</b></p>
       <p>Phone Number: <b>{{checkoutSummary.phone}}</b></p>
       <p>Address: <b>{{checkoutSummary.address}}</b></p>
       <p>Postcode: <b>{{checkoutSummary.postcode}}</b></p>
-      <p>Gift Aid: <b>{{checkoutSummary.giftAid ? "Yes" : "No"}}</b></p>
+      <p>Consent to Gift Aid: <b>{{checkoutSummary.giftAid ? "Yes" : "No"}}</b></p>
     </ng-container>
     <ng-container *ngIf="checkoutState === checkoutStates.NOT_BEGUN">
-      <h2>Setup the Donation</h2>
+      <h2>Confirm Your Day By Day Donation</h2>
       <p>
-        The "SETUP DONATION" button below will allow you to enter your payment details. It will then bring you back to this page as you donation is setup.
-        Please do not close the page.<br/>
-        <b>Please note the transaction fees are lower when paying via direct debit, so please prefer this payment option if possible.</b>
+        Select ‘Confirm Donation’ to enter your payment details and follow the instructions.
+        <em>Kindly note, we prefer Direct Debit as transaction fees are lower than Card.</em>
       </p>
       <div class="actions-container">
         <button mat-stroked-button matStepperPrevious>BACK</button>
-        <button mat-raised-button color="primary" (click)="setupPayment()">SETUP DONATION</button>
+        <button mat-raised-button color="primary" (click)="setupPayment()">CONFIRM DONATION</button>
       </div>
     </ng-container>
   </mat-step>
 
   <mat-step [editable]="!canEdit">
-    <ng-template matStepLabel>Complete</ng-template>
-    <h2>
-      Your Day By Day donation has been setup!<br/>
-      You should have received a confirmation email confirming the details,
-      including whether you are amongst those who will be recieving a framed brick as a gift.
+    <ng-template matStepLabel *ngIf="stepperVertical">Complete</ng-template>
+    <h1 *ngIf="!stepperVertical">Complete</h1>
+    <h2 *ngIf="fullSummary === null">
+      Loading Summary...
     </h2>
     <ng-container *ngIf="fullSummary !== null">
-      <h3>Summary:</h3>
+      <h2>Please save the information below for your records!</h2>
+      <p>
+        <em>Take a screenshot of this page and check that you have received a confirmation email.</em><br/><br/>
+        <ng-container *ngIf="fullSummary.targetID && fullSummary.targetID <= brickLimit">
+          <em>Alhamdulillah! You are amongst the first 300 people to set up donations of at least £30 per day for each of the 30 days of Ramadan.</em>
+          You will receive an invoice for each donation when this begins.<br/>
+          <strong>Once complete, you will become eligible to receive your gift, a framed brick from the original build of
+            Cambridge Central Mosque, presented at a ceremony by Shaykh Abdal Hakim Murad.</strong>
+        </ng-container>
+        <ng-container *ngIf="!(fullSummary.targetID && fullSummary.targetID <= brickLimit)">
+          <em>Alhamdulillah! You are amongst the first 300 people to set up donations of at least £30 per day for each of the 30 days of Ramadan.</em>
+          You will receive an invoice for each donation when this begins.<br/>
+        </ng-container>
+      </p>
+      <p>If you have any questions, reply to this email and we will endeavour to respond as soon as possible. Thank you for supporting Cambridge Central Mosque.</p>
+      <h2>Summary</h2>
+      <h3>Donation Details:</h3>
       <p>Daily Amount: <b>{{fullSummary.amount | currency:"GBP"}} / day</b></p>
       <p>Start Date: <b>{{numberToDate(fullSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
       <p>Duration: <b>{{fullSummary.iterations}} days</b></p>
       <br/>
       <p>On behalf of: <b>{{fullSummary.onBehalfOf}}</b></p>
       <p>Anonymous: <b>{{fullSummary.anonymous}}</b></p>
-      <br/>
+      <h3>Your Details:</h3>
       <p>First Name: <b>{{fullSummary.firstName}}</b></p>
       <p>Surname: <b>{{fullSummary.surname}}</b></p>
       <p>Email: <b>{{fullSummary.email}}</b></p>
@@ -177,7 +205,7 @@
       <p>Address: <b>{{fullSummary.address}}</b></p>
       <p>Postcode: <b>{{fullSummary.postcode}}</b></p>
       <br/>
-      <p>Gift Aid: <b>{{fullSummary.giftAid ? "Yes" : "No"}}</b></p>
+      <p>Consent to Gift Aid: <b>{{fullSummary.giftAid ? "Yes" : "No"}}</b></p>
       <p>Date of consent to Gift Aid: <b>{{numberToDate(fullSummary.giftAidConsentDate) | date:"dd/MM/yyyy"}}</b></p>
     </ng-container>
 

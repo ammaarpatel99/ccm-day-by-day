@@ -23,6 +23,7 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
   showCustomAmount = false
   stepperVertical = true
   private readonly destroyed = new AsyncSubject()
+  brickLimit = 0
   get showDonationLengths() {
     return this.applicationService.showDonationLengths
   }
@@ -71,7 +72,10 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
     return this.amount.valid && this.amount.dirty
   }
   get donationDetailsComplete() {
-    return this.donationInfo.valid && this.donorInfo.valid && this.consent.valid
+    return this.donationInfo.valid && this.donorInfo.valid
+  }
+  get consentComplete() {
+    return this.consent.valid
   }
 
   private _checkoutLoadingState: {
@@ -116,7 +120,7 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
 
   stepperSelectionChange(index: number) {
     if (
-      (this.showDonationLengths === false ? index === 2 : index === 3) &&
+      (this.showDonationLengths === false ? index === 3 : index === 4) &&
       this.checkoutState !== CheckoutState.RE_ESTABLISHING
     ) {
       this._checkoutSummary = null
@@ -134,7 +138,7 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
   }
 
   goToMainSite() {
-    location.replace("https://cambridgecentralmosque.org/daybyday")
+    location.replace("https://cambridgecentralmosque.org/daybydaythankyou")
   }
 
   numberToDate(n: number) {
@@ -171,6 +175,7 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
     this.configService.config$.subscribe(data => {
       this.disclaimer = data.disclaimer;
       this.giftAidDisclaimer = data.giftAidDisclaimer;
+      this.brickLimit = data.brickLimit;
     })
   }
 

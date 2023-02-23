@@ -30,12 +30,12 @@ export class DonationApplicationService implements OnDestroy {
     email: new FormControl("", [Validators.required, Validators.email]),
     phone: new FormControl("", Validators.required),
     address: new FormControl("", Validators.required),
-    postcode: new FormControl("", Validators.required),
-    giftAid: new FormControl(false, Validators.required)
+    postcode: new FormControl("", Validators.required)
   })
   readonly consent = new FormGroup({
     privacy: new FormControl(false, [Validators.required, Validators.requiredTrue]),
-    disclaimer: new FormControl(false, [Validators.required, Validators.requiredTrue])
+    disclaimer: new FormControl(false, [Validators.required, Validators.requiredTrue]),
+    giftAid: new FormControl(false, Validators.required)
   })
 
   constructor(
