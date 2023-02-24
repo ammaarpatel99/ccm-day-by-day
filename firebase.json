@@ -35,7 +35,7 @@
       ]
     },
     {
-      "target": "ccm-day-by-day",
+      "target": "day-by-day-c4787",
       "public": "dist/ccm-day-by-day",
       "ignore": [
         "**/.*"

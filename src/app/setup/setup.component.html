@@ -179,15 +179,16 @@
         <em>Take a screenshot of this page and check that you have received a confirmation email.</em><br/><br/>
         <ng-container *ngIf="fullSummary.targetID && fullSummary.targetID <= brickLimit">
           <em>Alhamdulillah! You are amongst the first 300 people to set up donations of at least £30 per day for each of the 30 days of Ramadan.</em>
-          You will receive an invoice for each donation when this begins.<br/>
+          You will receive an invoice for each donation when this begins.<br/><br/>
           <strong>Once complete, you will become eligible to receive your gift, a framed brick from the original build of
             Cambridge Central Mosque, presented at a ceremony by Shaykh Abdal Hakim Murad.</strong>
         </ng-container>
         <ng-container *ngIf="!(fullSummary.targetID && fullSummary.targetID <= brickLimit)">
-          <em>Alhamdulillah! You are amongst the first 300 people to set up donations of at least £30 per day for each of the 30 days of Ramadan.</em>
-          You will receive an invoice for each donation when this begins.<br/>
+          <em>Alhamdulillah! You have successfully set up daily donations for the holy month of Ramadan.</em>
+          You will receive an invoice for each donation when this begins.
         </ng-container>
       </p>
+      <br/>
       <p>If you have any questions, reply to this email and we will endeavour to respond as soon as possible. Thank you for supporting Cambridge Central Mosque.</p>
       <h2>Summary</h2>
       <h3>Donation Details:</h3>
@@ -209,6 +210,6 @@
       <p>Date of consent to Gift Aid: <b>{{numberToDate(fullSummary.giftAidConsentDate) | date:"dd/MM/yyyy"}}</b></p>
     </ng-container>
 
-    <button mat-raised-button color="primary" (click)="goToMainSite()">Return to Main Website</button>
+    <button mat-raised-button color="primary" (click)="goToMainSite()">Continue Back to Main Website</button>
   </mat-step>
 </mat-stepper>
