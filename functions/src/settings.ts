@@ -25,7 +25,8 @@ through this scheme is a donation to the Registered UK Charity 1164931
 If you are among the first 300 to set up donations of at least £30 for the
 full 30 days of Ramadan, you will be offered a framed brick with the option
 to receive it at a ceremony held in Cambridge; details TBC. This includes
-those commencing.<br/><br/>
+those commencing during Ramadan who donate for the days they've missed.<br/>
+<br/>
 If you did not select the “Anonymous” option, you consent to the name entered
 under “Donate on Behalf of” being published on our Digital Wall, website,
 social media & elsewhere, all of which will be accessible to members of the

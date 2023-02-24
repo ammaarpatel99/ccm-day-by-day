@@ -24,7 +24,7 @@ export async function sendConfirmationEmail(
     subject: "CCM Day By Day 2023",
     html: `
 <p>Assalamu ‘alaykum wa rahmatullah wa barakatuh,<br/>
-May the peace, mercy, and blessings of Allah be upon you<br/><br/>
+May the peace, mercy, and blessings of Allah be upon you,<br/><br/>
 <em>Thank you for donating to Cambridge Central Mosque.</em><br/>
 
 ${data.meetsTarget && ((data.targetID || 0) <= config.brickLimit) ? `
