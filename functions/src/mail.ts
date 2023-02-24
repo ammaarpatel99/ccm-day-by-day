@@ -21,7 +21,8 @@ export async function sendConfirmationEmail(
   return await transporter.sendMail({
     to: data.email,
     from: "CCM Day By Day<daybyday@cambridgecentralmosque.org>",
-    subject: "CCM Day By Day 2023",
+    subject: "Confirmation: Ramadan Day By Day Donations " +
+      "– Cambridge Central Mosque",
     html: `
 <p>Assalamu ‘alaykum wa rahmatullah wa barakatuh,<br/>
 May the peace, mercy, and blessings of Allah be upon you,<br/><br/>
