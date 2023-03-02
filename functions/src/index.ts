@@ -25,6 +25,8 @@ import {ApplicationWithCustomer, Subscription} from "./helpers";
 import {generateIDs} from "./counter";
 import {sendConfirmationEmail} from "./mail";
 
+export * as admin from "./admin";
+
 export const config = functions.https.onCall((): ConfigRes => {
   return configuration();
 });

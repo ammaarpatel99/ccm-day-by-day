@@ -10,7 +10,8 @@ export enum APIEndpoints {
   GET_APPLICATION = "getApplication",
   SETUP_PAYMENT = "setupPayment",
   SET_DEFAULT_PAYMENT_METHOD = "setDefaultPayment",
-  SETUP_SUBSCRIPTION = "setupSubscription"
+  SETUP_SUBSCRIPTION = "setupSubscription",
+  ADMIN_DIGITAL_WALL = "admin-digitalWall"
 }
 
 export type ConfigReq = void;
@@ -30,3 +31,11 @@ export type SetDefaultPaymentRes = void;
 
 export type SetupSubscriptionReq = {donationID: string};
 export type SetupSubscriptionRes = SubscriptionSummary;
+
+export interface AdminDigitalWallReq {
+  password: string;
+}
+
+export type AdminDigitalWallRes = {ID: number; name: string}[]
+
+

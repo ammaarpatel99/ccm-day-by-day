@@ -1,6 +1,4 @@
-import {initializeApp} from "firebase-admin/app";
 import {
-  getFirestore,
   FirestoreDataConverter,
   Timestamp,
 } from "firebase-admin/firestore";
@@ -8,9 +6,7 @@ import {
   Counter, Donation,
   StoredDonation, StoredIDDoc,
 } from "./helpers";
-
-const app = initializeApp();
-const firestore = getFirestore(app);
+import {firestore} from "./firebase";
 
 const donationConverter: FirestoreDataConverter<Donation> = {
   toFirestore(modelObject: Donation): FirebaseFirestore.DocumentData {
