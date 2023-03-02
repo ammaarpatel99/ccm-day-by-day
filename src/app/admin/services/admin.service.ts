@@ -5,7 +5,7 @@ import {EMPTY, map, switchMap} from "rxjs";
 import {Functions, httpsCallable} from "@angular/fire/functions";
 import {AdminDigitalWallReq, AdminDigitalWallRes, APIEndpoints} from "../../../../functions/src/api-types";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
-import {saveAs} from 'file-saver';
+import {saveAs} from 'file-saver-es';
 
 @Injectable({
   providedIn: 'root'
