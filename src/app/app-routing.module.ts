@@ -14,6 +14,10 @@ const routes: Routes = [
     component: PaymentSetupComponent
   },
   {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
+  },
+  {
     path: '',
     pathMatch: 'full',
     component: LoadingComponent
