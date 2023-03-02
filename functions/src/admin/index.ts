@@ -18,6 +18,7 @@ export const digitalWall = functions.https.onCall(
       }
       results.push({ID: data.targetID, name: data.onBehalfOf});
     });
+    results.sort((a, b) => a.ID - b.ID);
     return results;
   }
 );
