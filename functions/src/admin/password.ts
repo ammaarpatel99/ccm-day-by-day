@@ -1,6 +1,6 @@
 import {https} from "firebase-functions";
 
-const secretAdminPassword = "";
+const secretAdminPassword = "ConsistentEvenIfSmall";
 
 /**
  * checks admin password
