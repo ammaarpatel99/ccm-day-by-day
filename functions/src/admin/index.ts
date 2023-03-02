@@ -8,7 +8,7 @@ export const digitalWall = functions.https.onCall(
     checkPassword(data.password);
     const donations = await db.donations.get();
     const results: AdminDigitalWallRes = [];
-    donations.docs.forEach(doc => {
+    donations.docs.forEach((doc) => {
       const data = doc.data();
       if (data.status === "application" ||
         data.status === "application_with_customer" ||
