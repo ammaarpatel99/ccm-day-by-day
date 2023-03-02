@@ -7,6 +7,10 @@ import {AdminService} from "./services/admin.service";
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent {
+  downloadDigitalWall() {
+    this.adminService.getDigitalWallData().subscribe()
+  }
+
   constructor(
     private readonly adminService: AdminService
   ) { }
