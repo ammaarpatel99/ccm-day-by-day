@@ -22,6 +22,7 @@ import { PaymentSetupComponent } from './payment-setup/payment-setup.component';
 import {MatProgressBarModule} from "@angular/material/progress-bar";
 import { NoBrickDialogComponent } from './no-brick-dialog/no-brick-dialog.component';
 import {MatDialogModule} from "@angular/material/dialog";
+import {connectFirestoreEmulator, provideFirestore, getFirestore} from "@angular/fire/firestore";
 
 @NgModule({
   declarations: [
@@ -42,6 +43,13 @@ import {MatDialogModule} from "@angular/material/dialog";
                 connectFunctionsEmulator(functions, 'localhost', 5001);
             }
             return functions;
+        }),
+        provideFirestore(() => {
+          const firestore = getFirestore();
+          if (!environment.production) {
+            connectFirestoreEmulator(firestore, 'localhost', 8080);
+          }
+          return firestore;
         }),
         MatCardModule,
         MatStepperModule,
