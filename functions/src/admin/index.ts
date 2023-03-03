@@ -16,7 +16,10 @@ export const digitalWall = functions.https.onCall(
       ) {
         return;
       }
-      results.push({ID: data.targetID, name: data.onBehalfOf});
+      results.push({
+        ID: data.targetID,
+        name: data.anonymous ? "Anonymous" : data.onBehalfOf,
+      });
     });
     results.sort((a, b) => a.ID - b.ID);
     return results;
