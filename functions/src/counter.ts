@@ -50,9 +50,9 @@ export async function getCount() {
   const counter: Counter = {general: 0, target: 0, waseem: 0};
   for (const doc of documents) {
     const {general, target, waseem} = doc.data();
-    counter.general += general;
-    counter.target += target;
-    counter.waseem += waseem;
+    counter.general += general || 0;
+    counter.target += target || 0;
+    counter.waseem += waseem || 0;
   }
   return counter;
 }
