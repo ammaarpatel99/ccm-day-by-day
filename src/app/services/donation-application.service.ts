@@ -1,5 +1,5 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {DonationLength} from "../../../functions/src/api-types";
+import {DonationLength, PromoCode} from "../../../functions/src/api-types";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfigService} from "./config.service";
 import {AsyncSubject, combineLatest, filter, first, map, merge, shareReplay, switchMap, takeUntil, tap} from "rxjs";
@@ -37,6 +37,7 @@ export class DonationApplicationService implements OnDestroy {
     disclaimer: new FormControl(false, [Validators.required, Validators.requiredTrue]),
     giftAid: new FormControl(false, Validators.required)
   })
+  promoCode?: PromoCode;
 
   constructor(
     private readonly configService: ConfigService,

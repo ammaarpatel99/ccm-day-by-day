@@ -52,7 +52,8 @@ export class SetupService {
           anonymous: this.applicationService.donationInfo.controls.anonymous.value as boolean,
           amount: this.applicationService.donationAmount.value as number,
           donationLength: this.applicationService.donationLength.value as DonationLength,
-          status: "application"
+          status: "application",
+          promoCode: this.applicationService.promoCode
         }))
       ),
       map(({data}) => data),
@@ -90,7 +91,8 @@ export class SetupService {
           amount: this.applicationService.donationAmount.value as number,
           donationLength: this.applicationService.donationLength.value as DonationLength,
           status: "application",
-          successURL: this.successURL
+          successURL: this.successURL,
+          promoCode: this.applicationService.promoCode
         }))
       ),
       map(({data}) => {
