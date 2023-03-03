@@ -47,7 +47,7 @@ respond as soon as possible.<br/>
 <br/>
 <h3>Donation Details:</h3>
 Reference: <em>${donationID}</em><br/>
-Amount: <em>${data.amount}</em><br/>
+Amount: <em>£${data.amount}</em><br/>
 Start Date: <em>${new Date(data.startDate).toLocaleDateString("en-UK")}
 </em><br/>
 Days: <em>${data.iterations}</em><br/>
