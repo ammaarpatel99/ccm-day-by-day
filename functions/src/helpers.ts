@@ -11,6 +11,10 @@ export interface DonationChoice {
   amount: number;
 }
 
+export enum PromoCode {
+  WASEEM = "waseem"
+}
+
 interface BaseApplication {
   donationLength: DonationLength;
   amount: number;
@@ -24,6 +28,7 @@ interface BaseApplication {
   anonymous: boolean;
   giftAid: boolean;
   giftAidConsentDate: number;
+  promoCode?: PromoCode
 }
 export interface Application extends BaseApplication {
   status: "application";
@@ -40,6 +45,7 @@ interface BaseSubscription extends BaseApplicationWithCustomer {
   scheduleID: string;
   generalID: number;
   targetID: number | null;
+  waseemID: number | null;
   // The time in milliseconds (Date.getTime())
   created: number;
   emailSent: boolean;
@@ -90,6 +96,7 @@ export function dateToday() {
 export interface Counter {
   general: number;
   target: number;
+  waseem: number;
 }
 
 export interface StoredIDDoc {

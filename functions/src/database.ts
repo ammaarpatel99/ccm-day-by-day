@@ -71,4 +71,6 @@ export const db = {
     .withConverter(IDDocConverter),
   targetIDs: firestore.collection("targetIDs")
     .withConverter(IDDocConverter),
+  waseemIDs: firestore.collection("waseemIDs")
+    .withConverter(IDDocConverter),
 };

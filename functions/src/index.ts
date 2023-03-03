@@ -21,7 +21,7 @@ import {
 } from "./api-types";
 import {configuration} from "./settings";
 import {processSubscriptionInfo} from "./processSubscriptionInfo";
-import {ApplicationWithCustomer, Subscription} from "./helpers";
+import {ApplicationWithCustomer, PromoCode, Subscription} from "./helpers";
 import {generateIDs} from "./counter";
 import {sendConfirmationEmail} from "./mail";
 
@@ -92,11 +92,13 @@ export const setupSubscription = functions.https.onCall(
     const schedule =
       await createSubscriptionSchedule(docData, data.donationID);
     const IDs = await generateIDs(
-      data.donationID, paymentInfo.meetsTarget || undefined
+      data.donationID, paymentInfo.meetsTarget || undefined,
+      docData.promoCode === PromoCode.WASEEM || undefined
     );
     const subscription: Subscription = {
       ...docData, status: "subscription", generalID: IDs.general,
       targetID: paymentInfo.meetsTarget ? IDs.target : null,
+      waseemID: docData.promoCode === PromoCode.WASEEM ? IDs.waseem : null,
       scheduleID: schedule.id, created: schedule.created * 1000,
       emailSent: false,
     };

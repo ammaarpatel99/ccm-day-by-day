@@ -2,7 +2,7 @@ import {configuration} from "./settings";
 import {
   Application, ApplicationSummary, SubscriptionSummary,
 } from "./helpers";
-export {DonationLength} from "./helpers";
+export {DonationLength, PromoCode} from "./helpers";
 
 export enum APIEndpoints {
   CONFIG = "config",
