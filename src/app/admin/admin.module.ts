@@ -8,6 +8,7 @@ import {MatDialogModule} from "@angular/material/dialog";
 import {MatInputModule} from "@angular/material/input";
 import {FormsModule} from "@angular/forms";
 import {MatButtonModule} from "@angular/material/button";
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 
 
 @NgModule({
@@ -15,13 +16,14 @@ import {MatButtonModule} from "@angular/material/button";
     AdminComponent,
     PasswordDialogComponent
   ],
-  imports: [
-    CommonModule,
-    AdminRoutingModule,
-    MatDialogModule,
-    MatInputModule,
-    FormsModule,
-    MatButtonModule
-  ]
+    imports: [
+        CommonModule,
+        AdminRoutingModule,
+        MatDialogModule,
+        MatInputModule,
+        FormsModule,
+        MatButtonModule,
+        MatSlideToggleModule
+    ]
 })
 export class AdminModule { }

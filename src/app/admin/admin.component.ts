@@ -9,9 +9,15 @@ import {AsyncSubject, takeUntil} from "rxjs";
 })
 export class AdminComponent implements OnInit, OnDestroy {
   private readonly destroyed = new AsyncSubject<true>()
+  private readonly audio = new Audio("./assets/newDonorSound.mp3")
+  sound = false
 
   downloadDigitalWall() {
     this.adminService.getDigitalWallData().subscribe()
+  }
+
+  onSoundChange() {
+    if (this.sound) this.audio.play()
   }
 
   readonly counter = this.adminService.counter;
@@ -21,11 +27,10 @@ export class AdminComponent implements OnInit, OnDestroy {
   ) { }
 
   private watchCounter() {
-    const audio = new Audio("./assets/newDonorSound.wav")
     this.adminService.counter.pipe(
       takeUntil(this.destroyed)
     ).subscribe((res) => {
-      audio.play()
+      if (this.sound) this.audio.play()
     })
   }
 
