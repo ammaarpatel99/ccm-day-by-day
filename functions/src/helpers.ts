@@ -28,7 +28,8 @@ interface BaseApplication {
   anonymous: boolean;
   giftAid: boolean;
   giftAidConsentDate: number;
-  promoCode?: PromoCode
+  promoCode?: PromoCode;
+  tombstone?: boolean;
 }
 export interface Application extends BaseApplication {
   status: "application";
