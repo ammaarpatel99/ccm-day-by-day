@@ -7,7 +7,7 @@ export const digitalWall = functions.https.onCall(
   async (data: AdminDigitalWallReq): Promise<AdminDigitalWallRes> => {
     checkPassword(data.password);
     const donations = await db.donations.get();
-    const results: AdminDigitalWallRes = [];
+    const names: AdminDigitalWallRes = [];
     donations.docs.forEach((doc) => {
       const data = doc.data();
       if (data.status === "application" ||
@@ -20,9 +20,21 @@ export const digitalWall = functions.https.onCall(
       if (data.tombstone) name += "Tombstone - ";
       if (data.anonymous) name += "Anonymous";
       else name += data.onBehalfOf;
-      results.push({ID: data.targetID, name});
+      names.push({ID: data.targetID, name});
     });
-    results.sort((a, b) => a.ID - b.ID);
+    names.sort((a, b) => a.ID - b.ID);
+    const results: AdminDigitalWallRes = [];
+    let count = 0;
+    let tombstones = 0;
+    while (count+tombstones < names.length) {
+      const name = names[count+tombstones];
+      results.push({ID: count + 1, name: name.name});
+      if (name.name.startsWith("Tombstone")) {
+        tombstones++;
+      } else {
+        count++;
+      }
+    }
     return results;
   }
 );
