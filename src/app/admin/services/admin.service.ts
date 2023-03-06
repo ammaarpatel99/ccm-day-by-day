@@ -5,6 +5,7 @@ import {AsyncSubject, EMPTY, map, Observable, shareReplay, switchMap, takeUntil}
 import {Functions, httpsCallable} from "@angular/fire/functions";
 import {collection, Firestore, onSnapshot} from "@angular/fire/firestore";
 import {
+  AdminAddManualReq, AdminAddManualRes,
   AdminDecrementCounterReq, AdminDecrementCounterRes,
   AdminDigitalWallReq,
   AdminDigitalWallRes,
@@ -54,6 +55,20 @@ export class AdminService implements OnDestroy {
     )
   }
 
+  addManual(options: Omit<AdminAddManualReq, "password">) {
+    return this.getPassword().pipe(
+      switchMap(password => {
+        if (!password) {
+          console.log("No Password Entered")
+          return EMPTY;
+        }
+        return fromPromise(httpsCallable<AdminAddManualReq, AdminAddManualRes>(
+          this.functions, APIEndpoints.ADMIN_ADD_MANUAL
+        )({password, ...options}));
+      }),
+    )
+  }
+
   constructor(
     private readonly matDialog: MatDialog,
     private readonly functions: Functions,
@@ -74,11 +89,12 @@ export class AdminService implements OnDestroy {
     return new Observable<Counter>(subscriber => {
       onSnapshot(collection(this.firestore, "counters"), snapshot => {
         const counters = snapshot.docs.map(doc => doc.data() as Counter)
-        const res: Counter = {waseem: 0, target: 0, general: 0}
+        const res: Counter = {waseem: 0, target: 0, general: 0, manual: 0}
         for (const counter of counters) {
           res.general += counter.general || 0
           res.target += counter.target || 0
           res.waseem += counter.waseem || 0
+          res.manual += counter.manual || 0
         }
         subscriber.next(res)
       })
