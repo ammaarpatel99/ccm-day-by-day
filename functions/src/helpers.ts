@@ -59,7 +59,21 @@ export interface StoredSubscription extends Omit<Subscription, "created"> {
   created: Timestamp;
 }
 
-export type Donation = Application | Subscription | ApplicationWithCustomer;
+export interface ManualDonation {
+  status: "manual";
+  onBehalfOf: string;
+  generalID: number;
+  targetID: number;
+  tombstone?: boolean;
+  anonymous: boolean;
+  manualID: number;
+}
+
+export type Donation =
+  Application |
+  Subscription |
+  ApplicationWithCustomer |
+  ManualDonation;
 export type StoredDonation =
   Exclude<Donation, Subscription> | StoredSubscription;
 
@@ -98,6 +112,7 @@ export interface Counter {
   general: number;
   target: number;
   waseem: number;
+  manual: number;
 }
 
 export interface StoredIDDoc {

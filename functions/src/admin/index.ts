@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import {
+  AdminAddManualReq, AdminAddManualRes,
   AdminDecrementCounterReq,
   AdminDecrementCounterRes,
   AdminDigitalWallReq,
@@ -7,7 +8,8 @@ import {
 } from "../api-types";
 import {checkPassword} from "./password";
 import {db} from "../database";
-import {decrementCounter as decrementCounterFn} from "../counter";
+import {decrementCounter as decrementCounterFn, generateIDs} from "../counter";
+import {ManualDonation} from "../helpers";
 
 export const digitalWall = functions.https.onCall(
   async (data: AdminDigitalWallReq): Promise<AdminDigitalWallRes> => {
@@ -53,5 +55,29 @@ export const decrementCounter = functions.https.onCall(
       waseem: data.counters.waseem || undefined,
       target: data.counters.target || undefined,
     });
+  }
+);
+
+export const addManual = functions.https.onCall(
+  async (data: AdminAddManualReq): Promise<AdminAddManualRes> => {
+    checkPassword(data.password);
+    const obj: ManualDonation = {
+      anonymous: data.anonymous, status: "manual", targetID: -1,
+      generalID: -1, manualID: -1, onBehalfOf: data.onBehalfOf,
+    };
+    const doc = await db.donations.add(obj);
+    const IDs = await generateIDs(
+      doc.id, true, undefined, true
+    );
+    await db.donations.doc(doc.id).update({
+      manualID: IDs.manual,
+      generalID: IDs.general,
+      targetID: IDs.target,
+    });
+    return {
+      manualID: IDs.manual,
+      generalID: IDs.general,
+      brickID: IDs.target,
+    };
   }
 );

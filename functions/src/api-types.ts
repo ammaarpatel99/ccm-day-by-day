@@ -12,7 +12,8 @@ export enum APIEndpoints {
   SET_DEFAULT_PAYMENT_METHOD = "setDefaultPayment",
   SETUP_SUBSCRIPTION = "setupSubscription",
   ADMIN_DIGITAL_WALL = "admin-digitalWall",
-  ADMIN_DECREMENT_COUNTER = "admin-decrementCounter"
+  ADMIN_DECREMENT_COUNTER = "admin-decrementCounter",
+  ADMIN_ADD_MANUAL = "admin-addManual"
 }
 
 export type ConfigReq = void;
@@ -43,3 +44,14 @@ export type AdminDecrementCounterReq = {
   counters: { [key in keyof Counter]: boolean }
 }
 export type AdminDecrementCounterRes = void;
+
+export type AdminAddManualReq = {
+  password: string;
+  onBehalfOf: string;
+  anonymous: boolean;
+}
+export type AdminAddManualRes = {
+  generalID: number;
+  manualID: number;
+  brickID: number;
+};

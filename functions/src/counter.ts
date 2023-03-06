@@ -32,12 +32,14 @@ export async function incrementCounter(
   if (options.general) data.general = FieldValue.increment(1);
   if (options.target) data.target = FieldValue.increment(1);
   if (options.waseem) data.waseem = FieldValue.increment(1);
+  if (options.manual) data.manual = FieldValue.increment(1);
   await shardRef.set(data, {merge: true});
   const newValue = await getCount();
   return {
     target: {min: originalValue.target + 1, max: newValue.target},
     general: {min: originalValue.general + 1, max: newValue.general},
     waseem: {min: originalValue.waseem + 1, max: newValue.waseem},
+    manual: {min: originalValue.manual + 1, max: newValue.manual},
   };
 }
 
@@ -54,6 +56,7 @@ export async function decrementCounter(
   if (options.general) data.general = FieldValue.increment(-1);
   if (options.target) data.target = FieldValue.increment(-1);
   if (options.waseem) data.waseem = FieldValue.increment(-1);
+  if (options.manual) data.manual = FieldValue.increment(-1);
   await shardRef.set(data, {merge: true});
 }
 
@@ -64,12 +67,13 @@ export async function getCount() {
   const querySnapshot = await db.counters.get();
   const documents = querySnapshot.docs;
 
-  const counter: Counter = {general: 0, target: 0, waseem: 0};
+  const counter: Counter = {general: 0, target: 0, waseem: 0, manual: 0};
   for (const doc of documents) {
-    const {general, target, waseem} = doc.data();
+    const {general, target, waseem, manual} = doc.data();
     counter.general += general || 0;
     counter.target += target || 0;
     counter.waseem += waseem || 0;
+    counter.manual += manual || 0;
   }
   return counter;
 }
@@ -79,17 +83,32 @@ export async function getCount() {
  * @param {string} donationID
  * @param {true | undefined} generateTargetID
  * @param {true | undefined} generateWaseemID
+ * @param {true | undefined} generateManualID
  */
 export async function generateIDs(
-  donationID: string, generateTargetID?: true, generateWaseemID?: true
+  donationID: string,
+  generateTargetID?: true,
+  generateWaseemID?: true,
+  generateManualID?: true
 ): Promise<Counter> {
-  const {general, target, waseem} = await incrementCounter(
-    {general: true, target: generateTargetID, waseem: generateWaseemID}
+  const {general, target, waseem, manual} = await incrementCounter(
+    {
+      general: true,
+      target: generateTargetID,
+      waseem: generateWaseemID,
+      manual: generateManualID,
+    }
   );
   await setID(db.generalIDs, general.min, donationID);
   if (generateTargetID) await setID(db.targetIDs, target.min, donationID);
   if (generateWaseemID) await setID(db.waseemIDs, waseem.min, donationID);
-  return {general: general.min, target: target.min, waseem: waseem.min};
+  if (generateManualID) await setID(db.manualIDs, manual.min, donationID);
+  return {
+    general: general.min,
+    target: target.min,
+    waseem: waseem.min,
+    manual: manual.min,
+  };
 }
 
 /**

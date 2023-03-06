@@ -61,6 +61,9 @@ export const getApplication = functions.https.onCall(
     const doc = await db.donations.doc(data.donationID).get();
     const docData = doc.data();
     if (!docData) throw new Error("Application doesn't exist");
+    if (docData.status === "manual") {
+      throw new Error("Can't get manual donation");
+    }
     const paymentInfo = processSubscriptionInfo(docData);
     return {
       ...docData, ...paymentInfo, status: "application",
@@ -73,7 +76,7 @@ export const setDefaultPayment = functions.https.onCall(
     const doc = await db.donations.doc(data.donationID).get();
     const docData = doc.data();
     if (!docData) throw new Error("Application doesn't exist");
-    if (docData.status === "application") {
+    if (docData.status === "application" || docData.status === "manual") {
       throw new Error("Application doesn't have customerID set");
     }
     await setDefaultPaymentMethod(docData.customerID);
