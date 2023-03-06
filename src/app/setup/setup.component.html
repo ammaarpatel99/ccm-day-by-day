@@ -98,7 +98,7 @@
       <input matInput [formControl]="donationInfo.controls.onBehalfOf" placeholder="Donate on Behalf of">
       <mat-error *ngIf="donationInfo.controls.onBehalfOf.invalid">{{errorMessage(donationInfo.controls.onBehalfOf)}}</mat-error>
     </mat-form-field>
-    <p>If you have donated at least £30 for the full 30 days of Ramadan and wish to remain anonymous,
+    <p>If you have chosen to donate at least £30 for the full 30 days of Ramadan and wish to remain anonymous,
       check the option below to avoid being published on our Digital Wall.</p>
     <mat-slide-toggle color="primary" [formControl]="donationInfo.controls.anonymous">Anonymous</mat-slide-toggle>
     <div class="actions-container">
