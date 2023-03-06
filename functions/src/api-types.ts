@@ -1,6 +1,6 @@
 import {configuration} from "./settings";
 import {
-  Application, ApplicationSummary, SubscriptionSummary,
+  Application, ApplicationSummary, SubscriptionSummary, Counter,
 } from "./helpers";
 export {DonationLength, PromoCode, Counter} from "./helpers";
 
@@ -11,7 +11,8 @@ export enum APIEndpoints {
   SETUP_PAYMENT = "setupPayment",
   SET_DEFAULT_PAYMENT_METHOD = "setDefaultPayment",
   SETUP_SUBSCRIPTION = "setupSubscription",
-  ADMIN_DIGITAL_WALL = "admin-digitalWall"
+  ADMIN_DIGITAL_WALL = "admin-digitalWall",
+  ADMIN_DECREMENT_COUNTER = "admin-decrementCounter"
 }
 
 export type ConfigReq = void;
@@ -35,7 +36,10 @@ export type SetupSubscriptionRes = SubscriptionSummary;
 export interface AdminDigitalWallReq {
   password: string;
 }
-
 export type AdminDigitalWallRes = {ID: number; name: string}[]
 
-
+export type AdminDecrementCounterReq = {
+  password: string;
+  counters: { [key in keyof Counter]: boolean }
+}
+export type AdminDecrementCounterRes = void;

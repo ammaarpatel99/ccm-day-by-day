@@ -1,7 +1,13 @@
 import * as functions from "firebase-functions";
-import {AdminDigitalWallReq, AdminDigitalWallRes} from "../api-types";
+import {
+  AdminDecrementCounterReq,
+  AdminDecrementCounterRes,
+  AdminDigitalWallReq,
+  AdminDigitalWallRes,
+} from "../api-types";
 import {checkPassword} from "./password";
 import {db} from "../database";
+import {decrementCounter as decrementCounterFn} from "../counter";
 
 export const digitalWall = functions.https.onCall(
   async (data: AdminDigitalWallReq): Promise<AdminDigitalWallRes> => {
@@ -36,5 +42,16 @@ export const digitalWall = functions.https.onCall(
       }
     }
     return results;
+  }
+);
+
+export const decrementCounter = functions.https.onCall(
+  async (data: AdminDecrementCounterReq): Promise<AdminDecrementCounterRes> => {
+    checkPassword(data.password);
+    await decrementCounterFn({
+      general: data.counters.general || undefined,
+      waseem: data.counters.waseem || undefined,
+      target: data.counters.target || undefined,
+    });
   }
 );

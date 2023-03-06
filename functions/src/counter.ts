@@ -16,6 +16,8 @@ type incrementCounterRes = {
 
 type incrementCounterOptions = {[key in keyof Counter]?: true}
 
+const numShards = 5;
+
 /**
  * Increment the chosen counters
  * @param {incrementCounterOptions} options
@@ -24,7 +26,6 @@ export async function incrementCounter(
   options: incrementCounterOptions
 ): Promise<incrementCounterRes> {
   const originalValue = await getCount();
-  const numShards = 5;
   const shardId = Math.floor(Math.random() * numShards);
   const shardRef = db.counters.doc(shardId.toString());
   const data: PartialWithFieldValue<Counter> = {};
@@ -38,6 +39,22 @@ export async function incrementCounter(
     general: {min: originalValue.general + 1, max: newValue.general},
     waseem: {min: originalValue.waseem + 1, max: newValue.waseem},
   };
+}
+
+/**
+ * Increment the chosen counters
+ * @param {incrementCounterOptions} options
+ */
+export async function decrementCounter(
+  options: incrementCounterOptions
+): Promise<void> {
+  const shardId = Math.floor(Math.random() * numShards);
+  const shardRef = db.counters.doc(shardId.toString());
+  const data: PartialWithFieldValue<Counter> = {};
+  if (options.general) data.general = FieldValue.increment(-1);
+  if (options.target) data.target = FieldValue.increment(-1);
+  if (options.waseem) data.waseem = FieldValue.increment(-1);
+  await shardRef.set(data, {merge: true});
 }
 
 /**
