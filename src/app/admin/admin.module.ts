@@ -9,6 +9,7 @@ import {MatInputModule} from "@angular/material/input";
 import {FormsModule} from "@angular/forms";
 import {MatButtonModule} from "@angular/material/button";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import {MatSlideToggleModule} from "@angular/material/slide-toggle";
         MatInputModule,
         FormsModule,
         MatButtonModule,
-        MatSlideToggleModule
+        MatSlideToggleModule,
+        MatCheckboxModule
     ]
 })
 export class AdminModule { }

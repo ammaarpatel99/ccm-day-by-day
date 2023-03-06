@@ -5,3 +5,15 @@
 <p>Total: {{(counter | async)?.general}}</p>
 <h1>Controls</h1>
 <button mat-raised-button (click)="downloadDigitalWall()">Download Digital Wall Data</button>
+<h3>Decrement Counters – Use At Your Own Peril</h3>
+<mat-checkbox color="primary" [(ngModel)]="decrementGeneral" >General</mat-checkbox>
+<mat-checkbox color="primary" [(ngModel)]="decrementBrick">Brick Worthy</mat-checkbox>
+<mat-checkbox color="primary" [(ngModel)]="decrementWaseem">Waseem</mat-checkbox>
+<button
+  mat-raised-button color="primary"
+  [disabled]="decrementIsDisabled"
+  (click)="decrementCounters()"
+>
+  Decrement Selected Counters
+</button>
+

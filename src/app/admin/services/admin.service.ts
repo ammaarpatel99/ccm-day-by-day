@@ -4,7 +4,13 @@ import {PasswordDialogComponent} from "../password-dialog/password-dialog.compon
 import {AsyncSubject, EMPTY, map, Observable, shareReplay, switchMap, takeUntil} from "rxjs";
 import {Functions, httpsCallable} from "@angular/fire/functions";
 import {collection, Firestore, onSnapshot} from "@angular/fire/firestore";
-import {AdminDigitalWallReq, AdminDigitalWallRes, APIEndpoints, Counter} from "../../../../functions/src/api-types";
+import {
+  AdminDecrementCounterReq, AdminDecrementCounterRes,
+  AdminDigitalWallReq,
+  AdminDigitalWallRes,
+  APIEndpoints,
+  Counter
+} from "../../../../functions/src/api-types";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
 import {saveAs} from 'file-saver-es';
 
@@ -32,6 +38,20 @@ export class AdminService implements OnDestroy {
         saveAs(blob, "digital_wall_donors.csv")
       })
     );
+  }
+
+  decrementCounter(counters: AdminDecrementCounterReq['counters']) {
+    return this.getPassword().pipe(
+      switchMap(password => {
+        if (!password) {
+          console.log("No Password Entered")
+          return EMPTY;
+        }
+        return fromPromise(httpsCallable<AdminDecrementCounterReq, AdminDecrementCounterRes>(
+          this.functions, APIEndpoints.ADMIN_DECREMENT_COUNTER
+        )({password, counters}));
+      }),
+    )
   }
 
   constructor(
