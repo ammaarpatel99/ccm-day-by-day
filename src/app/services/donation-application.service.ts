@@ -21,7 +21,7 @@ export class DonationApplicationService implements OnDestroy {
   get showPresetAmounts() {return this._showPresetAmounts}
   readonly donationAmount = new FormControl(0)
   readonly donationInfo = new FormGroup({
-    onBehalfOf: new FormControl("", [Validators.maxLength(25)]),
+    onBehalfOf: new FormControl("", [Validators.maxLength(25), Validators.required]),
     anonymous: new FormControl(false, Validators.required)
   })
   readonly donorInfo = new FormGroup({
