@@ -97,7 +97,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.adminService.uploadFile({
       filename: digitalWall.name, imageDataURL: dataURL
     }).subscribe({
-      next: url => this.imageUploadTxt = `Image available at: "${url}`,
+      next: url => this.imageUploadTxt = `Image available at: "${url}"`,
       complete: () => this.uploadingImage = false
     });
   }
