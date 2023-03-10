@@ -7,7 +7,10 @@
 <h1>Controls</h1>
 <h3>Digital Wall</h3>
 <button mat-raised-button (click)="downloadDigitalWall()">Download Digital Wall Data</button>
-<br/><br/>
+<br/>
+<p>If the image you upload has the same name as an existing image, it will replace the existing image in the server.
+  Please do this as far as possible to keep the server as empty a possible.
+</p>
 <input type="file" (change)="uploadFile($event)" #digitalWallUploader hidden>
 <button mat-raised-button (click)="digitalWallUploader.click()" [disabled]="uploadingImage">Upload Digital Wall Image</button><br/>
 <p>{{imageUploadTxt}}</p>
