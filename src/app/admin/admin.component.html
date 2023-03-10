@@ -5,7 +5,12 @@
 <p>Manual: {{(counter | async)?.manual}}</p>
 <p>Total: {{(counter | async)?.general}}</p>
 <h1>Controls</h1>
+<h3>Digital Wall</h3>
 <button mat-raised-button (click)="downloadDigitalWall()">Download Digital Wall Data</button>
+<br/><br/>
+<input type="file" (change)="uploadFile($event)" #digitalWallUploader hidden>
+<button mat-raised-button (click)="digitalWallUploader.click()" [disabled]="uploadingImage">Upload Digital Image</button><br/>
+<p>{{imageUploadTxt}}</p>
 <h3>Manually Add Donor</h3>
 <p>
   This will give them eligibility to receive a brick and go on the digital wall.

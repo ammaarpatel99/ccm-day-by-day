@@ -8,7 +8,7 @@ import {
   AdminAddManualReq, AdminAddManualRes,
   AdminDecrementCounterReq, AdminDecrementCounterRes,
   AdminDigitalWallReq,
-  AdminDigitalWallRes,
+  AdminDigitalWallRes, AdminUploadDigitalWallReq, AdminUploadDigitalWallRes,
   APIEndpoints,
   Counter
 } from "../../../../functions/src/api-types";
@@ -66,6 +66,21 @@ export class AdminService implements OnDestroy {
           this.functions, APIEndpoints.ADMIN_ADD_MANUAL
         )({password, ...options}));
       }),
+    )
+  }
+
+  uploadFile(data: Omit<AdminUploadDigitalWallReq, "password">) {
+    return this.getPassword().pipe(
+      switchMap(password => {
+        if (!password) {
+          console.log("No Password Entered")
+          return EMPTY;
+        }
+        return fromPromise(httpsCallable<AdminUploadDigitalWallReq, AdminUploadDigitalWallRes>(
+          this.functions, APIEndpoints.ADMIN_UPLOAD_DIGITAL_WALL
+        )({...data, password}))
+      }),
+      map(res => res.data.url)
     )
   }
 

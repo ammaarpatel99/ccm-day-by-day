@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AdminService} from "./services/admin.service";
-import {AsyncSubject, takeUntil} from "rxjs";
+import {AsyncSubject, map, takeUntil} from "rxjs";
 import {FormControl, Validators} from "@angular/forms";
 
 @Component({
@@ -21,6 +21,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   manualAnonymous = false
   disableManual = false
   manualResult: string | null = null
+  uploadingImage = false;
+  imageUploadTxt = "";
 
 
   get decrementIsDisabled() {
@@ -70,6 +72,33 @@ export class AdminComponent implements OnInit, OnDestroy {
       complete: () => {
         this.disableManual = false
       }
+    });
+  }
+
+  async uploadFile(event: any) {
+    this.uploadingImage = true
+    const files = event?.target?.files
+    if (!files || !(files instanceof FileList)) {
+      throw new Error(`Incorrect event$ passed after file upload.`);
+    }
+    const digitalWall = files[0]
+    if (!digitalWall) {
+      this.imageUploadTxt = ""
+      return
+    }
+    this.imageUploadTxt = `Uploading "${digitalWall.name}"`;
+    const reader = new FileReader()
+    reader.readAsDataURL(digitalWall)
+    const dataURL = await new Promise<string>(resolve => {
+      reader.onloadend = () => {
+        resolve(reader.result as string)
+      }
+    })
+    this.adminService.uploadFile({
+      filename: digitalWall.name, imageDataURL: dataURL
+    }).subscribe({
+      next: url => this.imageUploadTxt = `Image available at: "${url}`,
+      complete: () => this.uploadingImage = false
     });
   }
 

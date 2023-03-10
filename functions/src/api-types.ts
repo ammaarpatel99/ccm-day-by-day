@@ -13,7 +13,8 @@ export enum APIEndpoints {
   SETUP_SUBSCRIPTION = "setupSubscription",
   ADMIN_DIGITAL_WALL = "admin-digitalWall",
   ADMIN_DECREMENT_COUNTER = "admin-decrementCounter",
-  ADMIN_ADD_MANUAL = "admin-addManual"
+  ADMIN_ADD_MANUAL = "admin-addManual",
+  ADMIN_UPLOAD_DIGITAL_WALL = "admin-uploadDigitalWall"
 }
 
 export type ConfigReq = void;
@@ -55,3 +56,12 @@ export type AdminAddManualRes = {
   manualID: number;
   brickID: number;
 };
+
+export interface AdminUploadDigitalWallReq {
+  password: string;
+  filename: string;
+  imageDataURL: string;
+}
+export interface AdminUploadDigitalWallRes {
+  url: string;
+}

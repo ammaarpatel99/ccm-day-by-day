@@ -4,12 +4,14 @@ import {
   AdminDecrementCounterReq,
   AdminDecrementCounterRes,
   AdminDigitalWallReq,
-  AdminDigitalWallRes,
+  AdminDigitalWallRes, AdminUploadDigitalWallReq, AdminUploadDigitalWallRes,
 } from "../api-types";
 import {checkPassword} from "./password";
 import {db} from "../database";
 import {decrementCounter as decrementCounterFn, generateIDs} from "../counter";
 import {ManualDonation} from "../helpers";
+import * as stream from "stream";
+import {storage} from "../firebase";
 
 export const digitalWall = functions.https.onCall(
   async (data: AdminDigitalWallReq): Promise<AdminDigitalWallRes> => {
@@ -79,5 +81,42 @@ export const addManual = functions.https.onCall(
       generalID: IDs.general,
       brickID: IDs.target,
     };
+  }
+);
+
+export const uploadDigitalWall = functions.https.onCall(
+  async (
+    data: AdminUploadDigitalWallReq
+  ): Promise<AdminUploadDigitalWallRes> => {
+    checkPassword(data.password);
+    const image = data.imageDataURL;
+    const mimeType = image.match(
+      /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/)?.[1];
+    const fileName = data.filename;
+    // trim off the part of the payload that is not part of the base64 string
+    const base64EncodedImageString =
+      image.replace(/^data:image\/\w+;base64,/, "");
+    const imageBuffer = Buffer.from(base64EncodedImageString, "base64");
+    const bufferStream = new stream.PassThrough();
+    bufferStream.end(imageBuffer);
+    // Define file and fileName
+    const file = storage.bucket().file(fileName);
+    const url = await new Promise<string>((resolve, reject) => {
+      bufferStream.pipe(file.createWriteStream({
+        metadata: {
+          contentType: mimeType,
+        },
+        public: true,
+      }))
+        .on("error", (err) => {
+          console.log("error from image upload", err);
+          reject(err);
+        })
+        .on("finish", () => {
+          // The file upload is complete.
+          resolve(file.publicUrl());
+        });
+    });
+    return {url};
   }
 );
