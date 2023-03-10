@@ -26,7 +26,7 @@ export const digitalWall = functions.https.onCall(
       }
       let name = "";
       if (data.tombstone) name += "Tombstone - ";
-      if (data.anonymous) name += "Anonymous";
+      if (data.anonymous || !data.onBehalfOf) name += "Anonymous";
       else name += data.onBehalfOf;
       names.push({ID: data.targetID, name});
     });
