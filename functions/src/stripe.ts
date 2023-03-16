@@ -67,27 +67,61 @@ export async function createSubscriptionSchedule(
   data: ApplicationWithCustomer, donationID: string,
 ) {
   const paymentInfo = processSubscriptionInfo(data);
-  return await stripe.subscriptionSchedules.create({
-    customer: data.customerID,
-    start_date: Math.floor(paymentInfo.startDate / 1000),
-    end_behavior: "cancel",
-    phases: [{
-      items: [{
-        price_data: {
-          product: stripeProduct,
-          currency: "gbp",
-          recurring: {interval: "day"},
-          tax_behavior: "inclusive",
-          unit_amount: data.amount * 100,
+  let invoice: Stripe.Response<Stripe.Invoice> | undefined;
+  if (paymentInfo.backPay > 0) {
+    invoice = await stripe.invoices.create({
+      customer: data.customerID,
+    });
+    await stripe.invoiceItems.create({
+      customer: data.customerID,
+      price_data: {
+        product: stripeProduct,
+        currency: "gbp",
+        tax_behavior: "inclusive",
+        unit_amount: paymentInfo.backPay * 100,
+      },
+      invoice: invoice.id,
+      period: {
+        start: Math.floor(paymentInfo.backPayPeriod.start / 1000),
+        end: Math.floor(paymentInfo.backPayPeriod.end / 1000),
+      },
+    });
+    invoice = await stripe.invoices.finalizeInvoice(invoice.id);
+  }
+  let subscription: Stripe.Response<Stripe.SubscriptionSchedule> | undefined;
+  if (paymentInfo.iterations > 0) {
+    subscription = await stripe.subscriptionSchedules.create({
+      customer: data.customerID,
+      start_date: Math.floor(paymentInfo.startDate / 1000),
+      end_behavior: "cancel",
+      phases: [{
+        items: [{
+          price_data: {
+            product: stripeProduct,
+            currency: "gbp",
+            recurring: {interval: "day"},
+            tax_behavior: "inclusive",
+            unit_amount: data.amount * 100,
+          },
+        }],
+        billing_cycle_anchor: "phase_start",
+        iterations: paymentInfo.iterations,
+        metadata: {
+          onBehalfOf: data.onBehalfOf,
+          anonymous: JSON.stringify(data.anonymous),
+          donationID: donationID,
         },
       }],
-      billing_cycle_anchor: "phase_start",
-      iterations: paymentInfo.iterations,
-      metadata: {
-        onBehalfOf: data.onBehalfOf,
-        anonymous: JSON.stringify(data.anonymous),
-        donationID: donationID,
-      },
-    }],
-  });
+    });
+  }
+  if (!subscription && !invoice) {
+    throw new Error(
+      "Signing up for subscription but nothing will ever be charged"
+    );
+  }
+  return {
+    backpayID: invoice?.id,
+    subscriptionScheduleID: subscription?.id,
+    created: (invoice?.created || subscription?.created || 0) * 1000,
+  };
 }
