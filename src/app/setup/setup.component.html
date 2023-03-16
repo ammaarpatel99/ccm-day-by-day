@@ -140,9 +140,14 @@
     <ng-container *ngIf="checkoutSummary != null">
       <h2>Summary</h2>
       <h3>Donation Details:</h3>
-      <p>Daily Amount: <b>{{checkoutSummary.amount | currency:"GBP"}} / day</b></p>
-      <p>Start Date: <b>{{numberToDate(checkoutSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
-      <p>Duration: <b>{{checkoutSummary.iterations}} days</b></p>
+      <ng-container *ngIf="checkoutSummary.backPay">
+        <p>Lump Sum Donation: <b>{{checkoutSummary.backPay | currency:"GBP"}}</b></p>
+      </ng-container>
+      <ng-container *ngIf="checkoutSummary.iterations">
+        <p>Daily Amount: <b>{{checkoutSummary.amount | currency:"GBP"}} / day</b></p>
+        <p>Start Date: <b>{{numberToDate(checkoutSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
+        <p>Duration: <b>{{checkoutSummary.iterations}} days</b></p>
+      </ng-container>
       <p>On behalf of: <b>{{checkoutSummary.onBehalfOf}}</b></p>
       <p>Anonymous: <b>{{checkoutSummary.anonymous ? "Yes" : "No"}}</b></p>
       <h3>Your Details:</h3>
@@ -192,9 +197,14 @@
       <p>If you have any questions, reply to this email and we will endeavour to respond as soon as possible. Thank you for supporting Cambridge Central Mosque.</p>
       <h2>Summary</h2>
       <h3>Donation Details:</h3>
-      <p>Daily Amount: <b>{{fullSummary.amount | currency:"GBP"}} / day</b></p>
-      <p>Start Date: <b>{{numberToDate(fullSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
-      <p>Duration: <b>{{fullSummary.iterations}} days</b></p>
+      <ng-container *ngIf="fullSummary.backPay">
+        <p>Lump Sum Donation: <b>{{fullSummary.backPay | currency:"GBP"}}</b></p>
+      </ng-container>
+      <ng-container *ngIf="fullSummary.iterations">
+        <p>Daily Amount: <b>{{fullSummary.amount | currency:"GBP"}} / day</b></p>
+        <p>Start Date: <b>{{numberToDate(fullSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
+        <p>Duration: <b>{{fullSummary.iterations}} days</b></p>
+      </ng-container>
       <br/>
       <p>On behalf of: <b>{{fullSummary.onBehalfOf}}</b></p>
       <p>Anonymous: <b>{{fullSummary.anonymous}}</b></p>

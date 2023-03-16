@@ -47,10 +47,15 @@ respond as soon as possible.<br/>
 <br/>
 <h3>Donation Details:</h3>
 Reference: <em>${donationID}</em><br/>
-Amount: <em>£${data.amount}</em><br/>
-Start Date: <em>${new Date(data.startDate).toLocaleDateString("en-UK")}
-</em><br/>
-Days: <em>${data.iterations}</em><br/>
+${data.lumpSum ?
+    `Lump Sum Donation: <em>£${data.lumpSum.amount}</em><br/>` :
+    ""}
+${data.scheduleID ?
+    `Daily Amount: <em>£${data.amount}</em><br/>` +
+    "Start Date: <em>" +
+    `${new Date(data.startDate).toLocaleDateString("en-UK")}` +
+    "</em><br/>" +
+    `Days: <em>${data.iterations}</em><br/>` : ""}
 Initiated: <em>${new Date(data.created).toLocaleDateString("en-UK")}</em><br/>
 On Behalf of: <em>${data.onBehalfOf}</em><br/>
 Anonymous: <em>${data.anonymous ? "Yes" : "No"}</em><br/>

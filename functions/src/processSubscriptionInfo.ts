@@ -4,7 +4,7 @@ import {
   differenceInDays,
   DonationChoice,
   ProcessedSubscriptionInfo,
-  DonationLength,
+  DonationLength, dateTomorrow,
 } from "./helpers";
 
 /**
@@ -16,8 +16,9 @@ export function processSubscriptionInfo(
   data: DonationChoice,
 ): ProcessedSubscriptionInfo {
   const config = configuration();
+  let partialRes: Omit<ProcessedSubscriptionInfo, "backPay"|"backPayPeriod"> | undefined;
   if (data.donationLength === DonationLength.LAST_10_DAYS) {
-    return {
+    partialRes = {
       startDate: config.last10Days,
       meetsTarget: false,
       iterations: 10,
@@ -26,13 +27,13 @@ export function processSubscriptionInfo(
     data.donationLength === DonationLength.FULL_RAMADAN &&
     data.amount >= config.targetAmount
   ) {
-    return {
+    partialRes = {
       startDate: config.ramadanStartDate,
       meetsTarget: true,
       iterations: 30,
     };
   } else if (data.donationLength === DonationLength.FULL_RAMADAN) {
-    return {
+    partialRes = {
       startDate: config.ramadanStartDate,
       meetsTarget: false,
       iterations: 30,
@@ -41,10 +42,30 @@ export function processSubscriptionInfo(
     const startDate = dateToday();
     const iterations = 30 -
       differenceInDays(startDate, config.ramadanStartDate);
-    return {
+    partialRes = {
       startDate: startDate,
       meetsTarget: false,
       iterations,
     };
   }
+  if (partialRes.startDate > new Date().getTime()) {
+    return {...partialRes, backPay: 0,
+      backPayPeriod: {start: partialRes.startDate, end: partialRes.startDate}
+    };
+  }
+  const tomorrow = dateTomorrow();
+  const backPayIterations = differenceInDays(tomorrow, partialRes.startDate);
+  const backPayAmount = backPayIterations * data.amount;
+  let remainingIterations = partialRes.iterations - backPayIterations;
+  if (remainingIterations < 0) remainingIterations = 0;
+  return {
+    startDate: tomorrow,
+    iterations: remainingIterations,
+    backPay: backPayAmount,
+    meetsTarget: partialRes.meetsTarget,
+    backPayPeriod: {
+      start: partialRes.startDate,
+      end: tomorrow - 1000,
+    },
+  };
 }

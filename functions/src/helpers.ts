@@ -43,7 +43,11 @@ export interface ApplicationWithCustomer extends BaseApplicationWithCustomer {
 }
 
 interface BaseSubscription extends BaseApplicationWithCustomer {
-  scheduleID: string;
+  scheduleID: string | undefined;
+  lumpSum?: {
+    invoiceID: string;
+    amount: number;
+  };
   generalID: number;
   targetID: number | null;
   waseemID: number | null;
@@ -81,7 +85,12 @@ export interface ProcessedSubscriptionInfo {
   // The time in milliseconds (Date.getTime())
   startDate: number;
   iterations: number;
+  backPay: number;
   meetsTarget: boolean;
+  backPayPeriod: {
+    start: number;
+    end: number;
+  }
 }
 
 export type ApplicationSummary = Application & ProcessedSubscriptionInfo;
@@ -105,6 +114,17 @@ export function differenceInDays(date1: number, date2: number) {
 export function dateToday() {
   const date = new Date();
   date.setHours(0, 0, 0, 0);
+  return date.getTime();
+}
+
+/**
+ * The current date with the time removed.
+ * @return {Date}
+ */
+export function dateTomorrow() {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + 1);
   return date.getTime();
 }
 

@@ -92,7 +92,7 @@ export const setupSubscription = functions.https.onCall(
       throw new Error("Application in incorrect state");
     }
     const paymentInfo = processSubscriptionInfo(docData);
-    const schedule =
+    const setupRes =
       await createSubscriptionSchedule(docData, data.donationID);
     const IDs = await generateIDs(
       data.donationID, paymentInfo.meetsTarget || undefined,
@@ -102,7 +102,12 @@ export const setupSubscription = functions.https.onCall(
       ...docData, status: "subscription", generalID: IDs.general,
       targetID: paymentInfo.meetsTarget ? IDs.target : null,
       waseemID: docData.promoCode === PromoCode.WASEEM ? IDs.waseem : null,
-      scheduleID: schedule.id, created: schedule.created * 1000,
+      scheduleID: setupRes.subscriptionScheduleID,
+      lumpSum: !setupRes.backpayID ? undefined : {
+        amount: paymentInfo.backPay,
+        invoiceID: setupRes.backpayID,
+      },
+      created: setupRes.created,
       emailSent: false,
     };
     await doc.set(subscription);
