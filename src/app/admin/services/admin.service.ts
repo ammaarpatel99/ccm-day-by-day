@@ -1,26 +1,25 @@
-import {Injectable, OnDestroy} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {MatDialog} from "@angular/material/dialog";
 import {PasswordDialogComponent} from "../password-dialog/password-dialog.component";
-import {AsyncSubject, EMPTY, map, Observable, shareReplay, switchMap, takeUntil} from "rxjs";
+import {EMPTY, map, switchMap} from "rxjs";
 import {Functions, httpsCallable} from "@angular/fire/functions";
-import {collection, Firestore, onSnapshot} from "@angular/fire/firestore";
+import {Firestore} from "@angular/fire/firestore";
 import {
   AdminAddManualReq, AdminAddManualRes,
   AdminDecrementCounterReq, AdminDecrementCounterRes,
   AdminDigitalWallReq,
   AdminDigitalWallRes, AdminUploadDigitalWallReq, AdminUploadDigitalWallRes,
-  APIEndpoints,
-  Counter
+  APIEndpoints
 } from "../../../../functions/src/api-types";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
 import {saveAs} from 'file-saver-es';
+import {CountersService} from "../../services/counters.service";
 
 @Injectable({
   providedIn: 'root'
 })
-export class AdminService implements OnDestroy {
-  private readonly destroyed = new AsyncSubject<true>();
-  readonly counter = this.getCounter();
+export class AdminService {
+  readonly counter = this.countersService.counter;
 
   getDigitalWallData() {
     return this.getPassword().pipe(
@@ -87,7 +86,8 @@ export class AdminService implements OnDestroy {
   constructor(
     private readonly matDialog: MatDialog,
     private readonly functions: Functions,
-    private readonly firestore: Firestore
+    private readonly firestore: Firestore,
+    private readonly countersService: CountersService
   ) { }
 
   private getPassword() {
@@ -98,29 +98,5 @@ export class AdminService implements OnDestroy {
           return undefined;
         })
       )
-  }
-
-  private getCounter() {
-    return new Observable<Counter>(subscriber => {
-      onSnapshot(collection(this.firestore, "counters"), snapshot => {
-        const counters = snapshot.docs.map(doc => doc.data() as Counter)
-        const res: Counter = {waseem: 0, target: 0, general: 0, manual: 0}
-        for (const counter of counters) {
-          res.general += counter.general || 0
-          res.target += counter.target || 0
-          res.waseem += counter.waseem || 0
-          res.manual += counter.manual || 0
-        }
-        subscriber.next(res)
-      })
-    }).pipe(
-      shareReplay(1),
-      takeUntil(this.destroyed)
-    )
-  }
-
-  ngOnDestroy(): void {
-    this.destroyed.next(true);
-    this.destroyed.complete();
   }
 }

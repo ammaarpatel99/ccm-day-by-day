@@ -1,6 +1,6 @@
 import {dateToday, differenceInDays, DonationLength} from "./helpers";
 
-const ramadanStartDate = new Date("2023-02-23").getTime();
+const ramadanStartDate = new Date("2023-03-23").getTime();
 
 const _date = new Date(ramadanStartDate);
 const last10Days = _date.setDate(_date.getDate() + 20);
