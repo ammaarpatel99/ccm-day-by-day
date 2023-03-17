@@ -11,6 +11,7 @@ import {
 } from "../../../functions/src/helpers";
 import {FormControl} from "@angular/forms";
 import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
+import {CountersService} from "../services/counters.service";
 
 @Component({
   selector: 'app-setup',
@@ -161,7 +162,8 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
     private readonly applicationService: DonationApplicationService,
     private readonly setupService: SetupService,
     private readonly configService: ConfigService,
-    private readonly breakpointObserver: BreakpointObserver
+    private readonly breakpointObserver: BreakpointObserver,
+    readonly countersService: CountersService
   ) {
   }
 
