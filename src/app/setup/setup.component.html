@@ -7,7 +7,8 @@
   labelPosition="bottom" linear #stepper
   (selectionChange)="stepperSelectionChange($event.selectedIndex)">
   <mat-step *ngIf="!!showDonationLengths" [editable]="canEdit" [completed]="!canEdit || donationLengthComplete">
-    <ng-template matStepLabel>Donation Length</ng-template>
+    <ng-template matStepLabel *ngIf="stepperVertical">Donation Length</ng-template>
+    <h1 *ngIf="!stepperVertical">Donation Length</h1>
     <p *ngIf="showBackdatingNote">
       Daily Ramadan donations will begin immediately, while donations for missed days will be calculated and collected automatically.
     </p>
