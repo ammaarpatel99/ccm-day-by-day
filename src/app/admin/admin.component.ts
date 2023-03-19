@@ -134,6 +134,10 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   readonly counter = this.adminService.counter;
 
+  fixCounters() {
+    this.adminService.fixCounters()
+  }
+
   constructor(
     private readonly adminService: AdminService
   ) { }

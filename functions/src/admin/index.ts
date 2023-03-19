@@ -138,3 +138,25 @@ export const uploadDigitalWall = functions.https.onCall(
     return {url};
   }
 );
+
+export const calculatePledges = functions.https.onCall(async () => {
+  const docs = await db.donations.get();
+  let pledged = 0;
+  let manual = 0;
+  docs.docs
+    .map((doc) => doc.data())
+    .filter((doc) => !doc.tombstone)
+    .forEach((doc) => {
+      if (doc.status === "manual") {
+        pledged += doc.amount;
+        manual += doc.amount;
+      } else if (doc.status === "subscription") {
+        pledged += doc.amount * 30;
+      }
+    });
+  await incrementIDsAndPledges("", {}, {
+    general: pledged,
+    target: pledged,
+    manual: manual,
+  });
+});
