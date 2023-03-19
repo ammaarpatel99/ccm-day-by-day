@@ -6,6 +6,7 @@
   [orientation]="stepperVertical ? 'vertical' : 'horizontal'"
   labelPosition="bottom" linear #stepper
   (selectionChange)="stepperSelectionChange($event.selectedIndex)">
+
   <mat-step *ngIf="!!showDonationLengths" [editable]="canEdit" [completed]="!canEdit || donationLengthComplete">
     <ng-template matStepLabel *ngIf="stepperVertical">Donation Length</ng-template>
     <h1 *ngIf="!stepperVertical">Donation Length</h1>
@@ -41,7 +42,7 @@
       <div class="custom-amounts-container">
         <mat-form-field floatLabel="always">
           <mat-label>Other Amount</mat-label>
-          <input matInput type="number" placeholder="0.00"  [formControl]="amount">
+          <input matInput type="number" placeholder="0.00" [formControl]="amount">
           <span matTextPrefix>£&nbsp;</span>
           <span matTextSuffix="">/day</span>
           <mat-error *ngIf="amount.invalid">{{errorMessage(amount)}}</mat-error>
@@ -56,77 +57,105 @@
   <mat-step [editable]="canEdit" [completed]="!canEdit || donationDetailsComplete">
     <ng-template matStepLabel *ngIf="stepperVertical">Details</ng-template>
     <h1 *ngIf="!stepperVertical">Details</h1>
-    <h2>Contact Details:</h2>
-    <mat-form-field>
-      <mat-label>First Name(s)</mat-label>
-      <input matInput placeholder="First Name(s)" [formControl]="donorInfo.controls.firstName">
-      <mat-error *ngIf="donorInfo.controls.firstName.invalid">{{errorMessage(donorInfo.controls.firstName)}}</mat-error>
-    </mat-form-field>
-    <mat-form-field>
-    <mat-label>Surname</mat-label>
-    <input matInput placeholder="Surname" [formControl]="donorInfo.controls.surname">
-    <mat-error *ngIf="donorInfo.controls.surname.invalid">{{errorMessage(donorInfo.controls.surname)}}</mat-error>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Email</mat-label>
-      <input matInput placeholder="xxx@example.com" [formControl]="donorInfo.controls.email">
-      <mat-error *ngIf="donorInfo.controls.email.invalid">{{errorMessage(donorInfo.controls.email)}}</mat-error>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Phone Number</mat-label>
-      <input matInput placeholder="+XX XXXX XXXXXX" [formControl]="donorInfo.controls.phone">
-      <mat-error *ngIf="donorInfo.controls.phone.invalid">{{errorMessage(donorInfo.controls.phone)}}</mat-error>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Address</mat-label>
-      <input matInput placeholder="309-313 Mill Rd, Cambridge, UK" [formControl]="donorInfo.controls.address">
-      <mat-error *ngIf="donorInfo.controls.address.invalid">{{errorMessage(donorInfo.controls.address)}}</mat-error>
-    </mat-form-field>
-    <mat-form-field>
-    <mat-label>Post Code</mat-label>
-    <input matInput placeholder="CB1 3DF" [formControl]="donorInfo.controls.postcode">
-    <mat-error *ngIf="donorInfo.controls.postcode.invalid">{{errorMessage(donorInfo.controls.postcode)}}</mat-error>
-    </mat-form-field>
-    <h2>Donate on behalf of:</h2>
-    <h3>(Can be yourself or someone else)</h3>
-    <img src="https://cambridgecentralmosque.org/wp-content/uploads/2023/02/ccm_daybyday_framedbrick1.jpg">
-    <p>
-      If you are among the first 300 to set up donations of at least £30 for the full 30 days of Ramadan,
-      the name you enter here will be engraved on the plaque affixed to the framed brick,
-      from the original build of Cambridge Central Mosque, that you will be gifted.
-      This name will also be featured on our Digital Wall.<br/>
-      <em>[Maximum 25 characters]</em>
-    </p>
-    <mat-form-field>
-      <mat-label>Name</mat-label>
-      <input matInput [formControl]="donationInfo.controls.onBehalfOf" placeholder="Donate on Behalf of">
-      <mat-error *ngIf="donationInfo.controls.onBehalfOf.invalid">{{errorMessage(donationInfo.controls.onBehalfOf)}}</mat-error>
-    </mat-form-field>
-    <p>If you have chosen to donate at least £30 for the full 30 days of Ramadan and wish to remain anonymous,
-      check the option below to avoid being published on our Digital Wall.</p>
-    <mat-slide-toggle color="primary" [formControl]="donationInfo.controls.anonymous">Anonymous</mat-slide-toggle>
-    <div class="actions-container">
-      <button mat-stroked-button matStepperPrevious>BACK</button>
-      <button mat-raised-button color="primary" matStepperNext [disabled]="!donationDetailsComplete">NEXT</button>
-    </div>
+    <form autocomplete="on">
+      <h2>Contact Details:</h2>
+      <mat-form-field>
+        <mat-label>First Name(s)</mat-label>
+        <input matInput placeholder="First Name(s)" [formControl]="donorInfo.controls.firstName" name="given-name" autocomplete="given-name">
+        <mat-error *ngIf="donorInfo.controls.firstName.invalid">{{errorMessage(donorInfo.controls.firstName)}}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+      <mat-label>Surname</mat-label>
+      <input matInput placeholder="Surname" [formControl]="donorInfo.controls.surname" name="family-name" autocomplete="family-name">
+      <mat-error *ngIf="donorInfo.controls.surname.invalid">{{errorMessage(donorInfo.controls.surname)}}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Email</mat-label>
+        <input matInput placeholder="xxx@example.com" [formControl]="donorInfo.controls.email" type="email" name="email" autocomplete="email">
+        <mat-error *ngIf="donorInfo.controls.email.invalid">{{errorMessage(donorInfo.controls.email)}}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Phone Number</mat-label>
+        <input matInput placeholder="+XX XXXX XXXXXX" [formControl]="donorInfo.controls.phone" name="tel" autocomplete="tel">
+        <mat-error *ngIf="donorInfo.controls.phone.invalid">{{errorMessage(donorInfo.controls.phone)}}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Address</mat-label>
+        <input matInput placeholder="309-313 Mill Rd, Cambridge, UK" [formControl]="donorInfo.controls.address" name="street-address" autocomplete="street-address">
+        <mat-error *ngIf="donorInfo.controls.address.invalid">{{errorMessage(donorInfo.controls.address)}}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+      <mat-label>Post Code</mat-label>
+      <input matInput placeholder="CB1 3DF" [formControl]="donorInfo.controls.postcode" name="postal-code" autocomplete="postal-code">
+      <mat-error *ngIf="donorInfo.controls.postcode.invalid">{{errorMessage(donorInfo.controls.postcode)}}</mat-error>
+      </mat-form-field>
+      <h2>Donate on behalf of:</h2>
+      <h2>(Can be yourself or someone else)</h2>
+      <img src="https://cambridgecentralmosque.org/wp-content/uploads/2023/02/ccm_daybyday_framedbrick1.jpg">
+      <p>
+        If you are among the first 300 to set up donations of at least £30 for the full 30 days of Ramadan,
+        the name you enter here will be engraved on the plaque affixed to the framed brick,
+        from the original build of Cambridge Central Mosque, that you will be gifted.
+        This name will also be featured on our Digital Wall.<br/>
+        <em>[Maximum 25 characters]</em>
+      </p>
+      <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput [formControl]="donationInfo.controls.onBehalfOf" placeholder="Donate on Behalf of">
+        <mat-error *ngIf="donationInfo.controls.onBehalfOf.invalid">{{errorMessage(donationInfo.controls.onBehalfOf)}}</mat-error>
+      </mat-form-field>
+      <p>If you have chosen to donate at least £30 for the full 30 days of Ramadan and wish to remain anonymous,
+        check the option below to avoid being published on our Digital Wall.</p>
+      <mat-slide-toggle color="primary" [formControl]="donationInfo.controls.anonymous">Anonymous</mat-slide-toggle>
+      <div class="actions-container">
+        <button mat-stroked-button matStepperPrevious>BACK</button>
+        <button mat-raised-button color="primary" type="submit" matStepperNext [disabled]="!donationDetailsComplete">NEXT</button>
+      </div>
+    </form>
   </mat-step>
 
   <mat-step [editable]="canEdit" [completed]="!canEdit || consentComplete">
     <ng-template matStepLabel *ngIf="stepperVertical">Consent</ng-template>
     <h1 *ngIf="!stepperVertical">Consent</h1>
-    <h4>Disclaimer</h4>
+    <h2>Disclaimer</h2>
     <p [innerHTML]="disclaimer"></p>
     <mat-slide-toggle [formControl]="consent.controls.disclaimer" color="primary">I have read, understood, and accepted the above disclaimer.</mat-slide-toggle>
-    <h4>Data and Privacy Policy</h4>
+    <h2>Data and Privacy Policy</h2>
     <mat-slide-toggle [formControl]="consent.controls.privacy" color="primary">
       Accept our <a href="https://cambridgecentralmosque.org/legal/" target="_blank" rel="noopener noreferer">Data & Privacy Policy</a>
     </mat-slide-toggle>
-    <h4>Gift Aid (Optional)</h4>
+    <h2>Gift Aid (Optional)</h2>
     <p [innerHTML]="giftAidDisclaimer"></p>
     <mat-slide-toggle [formControl]="consent.controls.giftAid" color="primary">Consent to Gift Aid</mat-slide-toggle>
     <div class="actions-container">
       <button mat-stroked-button matStepperPrevious>BACK</button>
       <button mat-raised-button color="primary" matStepperNext [disabled]="!consentComplete">NEXT</button>
+    </div>
+  </mat-step>
+
+  <mat-step [editable]="canEdit" [completed]="!canEdit || consentComplete">
+    <ng-template matStepLabel *ngIf="stepperVertical">Iftars</ng-template>
+    <h1 *ngIf="!stepperVertical">Iftars</h1>
+    <h4>Would you like to add a little extra to your daily donation to provide iftar for the fasting this Ramadan?</h4>
+    <h3><em>
+      It was narrated from Zaid bin Khalid Al-Juhani that the Messenger of Allah (ﷺ) said:<br/>
+      “Whoever gives food for a fasting person to break his fast, he will have a reward like theirs,
+      without that detracting from their reward in the slightest.
+    </em></h3><br/>
+
+    <mat-form-field>
+      <mat-label>Additional Daily Donation for Iftars</mat-label>
+      <input type="number" matInput [formControl]="iftarAmount">
+      <span matTextPrefix>£&nbsp;</span>
+      <span matTextSuffix="">/day</span>
+      <mat-error *ngIf="iftarAmount.invalid">{{errorMessage(iftarAmount)}}</mat-error>
+    </mat-form-field>
+    <div class="actions-container">
+      <button mat-stroked-button matStepperPrevious>BACK</button>
+      <button mat-raised-button color="primary" matStepperNext [disabled]="iftarAmount.invalid">NEXT</button>
+    </div>
+    <div class="actions-container">
+      <button mat-stroked-button color="primary" matStepperNext (click)="resetIftarAmount()">SKIP</button>
     </div>
   </mat-step>
 
@@ -143,18 +172,20 @@
     </div>
     <ng-container *ngIf="checkoutSummary != null">
       <h2>Summary</h2>
-      <h3>Donation Details:</h3>
+      <h2>Donation Details:</h2>
       <ng-container *ngIf="checkoutSummary.backPay">
         <p>Lump Sum Donation: <b>{{checkoutSummary.backPay | currency:"GBP"}}</b></p>
+        <p>Lump Sum Donation for Iftars: <b>{{checkoutSummary.backPayIftars | currency:"GBP"}}</b></p>
       </ng-container>
       <ng-container *ngIf="checkoutSummary.iterations">
         <p>Daily Amount: <b>{{checkoutSummary.amount | currency:"GBP"}} / day</b></p>
+        <p>Additional Daily Amount for Iftars: <b>{{checkoutSummary.iftarAmount | currency:"GBP"}} / day</b></p>
         <p>Start Date: <b>{{numberToDate(checkoutSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
         <p>Duration: <b>{{checkoutSummary.iterations}} days</b></p>
       </ng-container>
       <p>On behalf of: <b>{{checkoutSummary.onBehalfOf}}</b></p>
       <p>Anonymous: <b>{{checkoutSummary.anonymous ? "Yes" : "No"}}</b></p>
-      <h3>Your Details:</h3>
+      <h2>Your Details:</h2>
       <p>First Name: <b>{{checkoutSummary.firstName}}</b></p>
       <p>Surname: <b>{{checkoutSummary.surname}}</b></p>
       <p>Email: <b>{{checkoutSummary.email}}</b></p>
@@ -200,19 +231,21 @@
       <br/>
       <p>If you have any questions, reply to this email and we will endeavour to respond as soon as possible. Thank you for supporting Cambridge Central Mosque.</p>
       <h2>Summary</h2>
-      <h3>Donation Details:</h3>
+      <h2>Donation Details:</h2>
       <ng-container *ngIf="fullSummary.backPay">
         <p>Lump Sum Donation: <b>{{fullSummary.backPay | currency:"GBP"}}</b></p>
+        <p>Lump Sum Donation for Iftars: <b>{{fullSummary.backPayIftars | currency:"GBP"}}</b></p>
       </ng-container>
       <ng-container *ngIf="fullSummary.iterations">
         <p>Daily Amount: <b>{{fullSummary.amount | currency:"GBP"}} / day</b></p>
+        <p>Additional Daily Amount for Iftars: <b>{{fullSummary.iftarAmount | currency:"GBP"}} / day</b></p>
         <p>Start Date: <b>{{numberToDate(fullSummary.startDate) | date:"dd/MM/yyyy"}}</b></p>
         <p>Duration: <b>{{fullSummary.iterations}} days</b></p>
       </ng-container>
       <br/>
       <p>On behalf of: <b>{{fullSummary.onBehalfOf}}</b></p>
       <p>Anonymous: <b>{{fullSummary.anonymous}}</b></p>
-      <h3>Your Details:</h3>
+      <h2>Your Details:</h2>
       <p>First Name: <b>{{fullSummary.firstName}}</b></p>
       <p>Surname: <b>{{fullSummary.surname}}</b></p>
       <p>Email: <b>{{fullSummary.email}}</b></p>

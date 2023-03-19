@@ -4,7 +4,8 @@ import {processSubscriptionInfo} from "./processSubscriptionInfo";
 
 const stripeKey = "sk_live_51MOiitFg1jrvwujs2e2XNzPQlE04EGUKClacqFLfkkGgx" +
   "lSxNHXHYXrVkmlUq7dRYFn8C4jlB9MApFcZLER0vbBD00QprYQEaj";
-const stripeProduct = "prod_NPVkEw65yq837V";
+const stripeDayByDayProduct = "prod_NPVkEw65yq837V";
+const stripeIftarProduct = "prod_NX1cJuwZ41XYiZ";
 const stripe = new Stripe(stripeKey, {apiVersion: "2022-11-15"});
 
 /**
@@ -75,7 +76,7 @@ export async function createSubscriptionSchedule(
     await stripe.invoiceItems.create({
       customer: data.customerID,
       price_data: {
-        product: stripeProduct,
+        product: stripeDayByDayProduct,
         currency: "gbp",
         tax_behavior: "inclusive",
         unit_amount: paymentInfo.backPay * 100,
@@ -86,24 +87,53 @@ export async function createSubscriptionSchedule(
         end: Math.floor(paymentInfo.backPayPeriod.end / 1000),
       },
     });
+    if (paymentInfo.backPayIftars) {
+      await stripe.invoiceItems.create({
+        customer: data.customerID,
+        price_data: {
+          product: stripeIftarProduct,
+          currency: "gbp",
+          tax_behavior: "inclusive",
+          unit_amount: paymentInfo.backPayIftars * 100,
+        },
+        invoice: invoice.id,
+        period: {
+          start: Math.floor(paymentInfo.backPayPeriod.start / 1000),
+          end: Math.floor(paymentInfo.backPayPeriod.end / 1000),
+        },
+      });
+    }
     invoice = await stripe.invoices.finalizeInvoice(invoice.id);
   }
   let subscription: Stripe.Response<Stripe.SubscriptionSchedule> | undefined;
   if (paymentInfo.iterations > 0) {
+    const items: Stripe.SubscriptionScheduleCreateParams.Phase.Item[] = [];
+    items.push({
+      price_data: {
+        product: stripeDayByDayProduct,
+        currency: "gbp",
+        recurring: {interval: "day"},
+        tax_behavior: "inclusive",
+        unit_amount: data.amount * 100,
+      },
+    });
+    if (data.iftarAmount) {
+      items.push({
+        price_data: {
+          product: stripeIftarProduct,
+          currency: "gbp",
+          recurring: {interval: "day"},
+          tax_behavior: "inclusive",
+          unit_amount: data.iftarAmount * 100,
+        },
+      });
+    }
     subscription = await stripe.subscriptionSchedules.create({
       customer: data.customerID,
       start_date: Math.floor(paymentInfo.startDate / 1000),
       end_behavior: "cancel",
       phases: [{
-        items: [{
-          price_data: {
-            product: stripeProduct,
-            currency: "gbp",
-            recurring: {interval: "day"},
-            tax_behavior: "inclusive",
-            unit_amount: data.amount * 100,
-          },
-        }],
+        items,
         billing_cycle_anchor: "phase_start",
         iterations: paymentInfo.iterations,
         metadata: {

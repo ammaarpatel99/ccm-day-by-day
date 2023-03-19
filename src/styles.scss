@@ -71,6 +71,7 @@ $ccm-day-by-day-warn: mat.define-palette(mat.$red-palette);
 $ccm-typography: mat.define-typography-config(
   $font-family: 'Montserrat',
 );
+@include mat.typography-hierarchy($ccm-typography);
 
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".

@@ -16,7 +16,9 @@ export function processSubscriptionInfo(
   data: DonationChoice,
 ): ProcessedSubscriptionInfo {
   const config = configuration();
-  let partialRes: Omit<ProcessedSubscriptionInfo, "backPay"|"backPayPeriod"> | undefined;
+  let partialRes: Omit<ProcessedSubscriptionInfo,
+    "backPay"|"backPayPeriod"|"backPayIftars"
+  > | undefined;
   if (data.donationLength === DonationLength.LAST_10_DAYS) {
     partialRes = {
       startDate: config.last10Days,
@@ -49,19 +51,21 @@ export function processSubscriptionInfo(
     };
   }
   if (partialRes.startDate > new Date().getTime()) {
-    return {...partialRes, backPay: 0,
-      backPayPeriod: {start: partialRes.startDate, end: partialRes.startDate}
+    return {...partialRes, backPay: 0, backPayIftars: 0,
+      backPayPeriod: {start: partialRes.startDate, end: partialRes.startDate},
     };
   }
   const tomorrow = dateTomorrow();
   const backPayIterations = differenceInDays(tomorrow, partialRes.startDate);
   const backPayAmount = backPayIterations * data.amount;
+  const backPayIftarAmount = backPayIterations * (data.iftarAmount || 0);
   let remainingIterations = partialRes.iterations - backPayIterations;
   if (remainingIterations < 0) remainingIterations = 0;
   return {
     startDate: tomorrow,
     iterations: remainingIterations,
     backPay: backPayAmount,
+    backPayIftars: backPayIftarAmount,
     meetsTarget: partialRes.meetsTarget,
     backPayPeriod: {
       start: partialRes.startDate,

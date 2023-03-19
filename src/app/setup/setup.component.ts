@@ -37,6 +37,9 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
   get amount() {
     return this.applicationService.donationAmount
   }
+  get iftarAmount() {
+    return this.applicationService.iftarDonationAmount
+  }
   get donationLength() {
     return this.applicationService.donationLength
   }
@@ -121,7 +124,7 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
 
   stepperSelectionChange(index: number) {
     if (
-      (this.showDonationLengths === false ? index === 3 : index === 4) &&
+      this.stepper.steps.toArray().indexOf(this.checkoutStep) === index &&
       this.checkoutState !== CheckoutState.RE_ESTABLISHING
     ) {
       this._checkoutSummary = null
@@ -156,6 +159,10 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
     if (control.hasError("min")) return "The amount must be at least " + control.getError("min").min;
     if (control.invalid) return Object.entries(control.errors || {})[0][1];
     return ""
+  }
+
+  resetIftarAmount() {
+    this.iftarAmount.setValue(0);
   }
 
   constructor(

@@ -1,44 +1,85 @@
 <h1>Counters</h1>
 <mat-slide-toggle [(ngModel)]="sound" (click)="onSoundChange()" color="primary">Enable Sound on New Sign Up</mat-slide-toggle>
+<br/><br/>
 <p>Brick Worthy: {{(counter | async)?.target}}</p>
 <p>Through Waseem: {{(counter | async)?.waseem}}</p>
 <p>Manual: {{(counter | async)?.manual}}</p>
 <p>Total: {{(counter | async)?.general}}</p>
+<h3>Pledges (incl. already paid)</h3>
+<p>Pledged at Target/Brick Amount: {{(counter | async)?.targetPledges | currency:"GBP"}}</p>
+<p>Pledged Through Waseem: {{(counter | async)?.waseemPledges | currency:"GBP"}}</p>
+<p>Pledged Manually: {{(counter | async)?.manualPledges | currency:"GBP"}}</p>
+<p>Total Pledged: {{(counter | async)?.pledges | currency:"GBP"}}</p>
+<p>Pledged for Iftar (not incl. above): {{(counter | async)?.iftarPledges | currency:"GBP"}}</p>
 <h1>Controls</h1>
 <h3>Digital Wall</h3>
 <button mat-raised-button (click)="downloadDigitalWall()">Download Digital Wall Data</button>
+<br/>
 <br/>
 <p>If the image you upload has the same name as an existing image, it will replace the existing image in the server.
   Please do this as far as possible to keep the server as empty a possible.
 </p>
 <input type="file" (change)="uploadFile($event)" #digitalWallUploader hidden>
-<button mat-raised-button (click)="digitalWallUploader.click()" [disabled]="uploadingImage">Upload Digital Wall Image</button><br/>
+<button mat-raised-button (click)="digitalWallUploader.click()" [disabled]="uploadingImage">Upload Digital Wall Image</button>
+<br/>
+<br/>
 <p>{{imageUploadTxt}}</p>
 <h3>Manually Add Donor</h3>
 <p>
   This will give them eligibility to receive a brick and go on the digital wall.
   This will <strong>not</strong> store sufficient data regarding them and their donation, so their data needs to be stored elsewhere.
 </p>
-<mat-form-field style="width: 100%;">
+<mat-form-field>
   <mat-label>On Behalf Of (digital wall & brick)</mat-label>
-  <input matInput [formControl]="manualOnBehalfOf">
+  <input matInput [formControl]="manualForm.controls.onBehalfOf">
 </mat-form-field>
 <br/>
-<mat-checkbox color="primary" [(ngModel)]="manualAnonymous">Anonymous</mat-checkbox>
+<mat-form-field>
+  <mat-label>Amount</mat-label>
+  <input type="number" matInput [formControl]="manualForm.controls.amount">
+  <span matTextPrefix>£&nbsp;</span>
+</mat-form-field>
+<br/>
+<mat-checkbox color="primary" [formControl]="manualForm.controls.anonymous">Anonymous</mat-checkbox>
 <br/>
 <button
   mat-raised-button color="primary"
-  [disabled]="manualOnBehalfOf.invalid || disableManual"
+  [disabled]="manualIsDisabled"
   (click)="addManual()"
 >Submit</button>
 <p *ngIf="manualResult"><em>ID: {{manualResult}}</em></p>
 
 
 <h3>Decrement Counters – Use At Your Own Peril</h3>
-<mat-checkbox color="primary" [(ngModel)]="decrementGeneral" >General</mat-checkbox>
-<mat-checkbox color="primary" [(ngModel)]="decrementBrick">Brick Worthy</mat-checkbox>
-<mat-checkbox color="primary" [(ngModel)]="decrementWaseem">Waseem</mat-checkbox>
-<mat-checkbox color="primary" [(ngModel)]="decrementManual">Manual</mat-checkbox>
+<mat-checkbox color="primary" [formControl]="decrementForm.controls.brick">Brick Worthy</mat-checkbox>
+<mat-checkbox color="primary" [formControl]="decrementForm.controls.waseem">Through Waseem</mat-checkbox>
+<mat-checkbox color="primary" [formControl]="decrementForm.controls.manual">Manual</mat-checkbox>
+<mat-checkbox color="primary" [formControl]="decrementForm.controls.general" >Total</mat-checkbox>
+<mat-form-field>
+  <mat-label>Pledged at Target/Brick Amount</mat-label>
+  <input type="number" matInput [formControl]="decrementForm.controls.brickPledge">
+  <span matTextPrefix>£&nbsp;</span>
+</mat-form-field>
+<mat-form-field>
+  <mat-label>Pledged Through Waseem</mat-label>
+  <input type="number" matInput [formControl]="decrementForm.controls.waseemPledge">
+  <span matTextPrefix>£&nbsp;</span>
+</mat-form-field>
+<mat-form-field>
+  <mat-label>Pledged Manually</mat-label>
+  <input type="number" matInput [formControl]="decrementForm.controls.manualPledge">
+  <span matTextPrefix>£&nbsp;</span>
+</mat-form-field>
+<mat-form-field>
+  <mat-label>Total Pledged</mat-label>
+  <input type="number" matInput [formControl]="decrementForm.controls.generalPledge">
+  <span matTextPrefix>£&nbsp;</span>
+</mat-form-field>
+<mat-form-field>
+  <mat-label>Pledged for Iftar (not incl. above)</mat-label>
+  <input type="number" matInput [formControl]="decrementForm.controls.iftarPledge">
+  <span matTextPrefix>£&nbsp;</span>
+</mat-form-field>
 <br/>
 <button
   mat-raised-button color="warn"

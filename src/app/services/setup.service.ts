@@ -53,7 +53,8 @@ export class SetupService {
           amount: this.applicationService.donationAmount.value as number,
           donationLength: this.applicationService.donationLength.value as DonationLength,
           status: "application",
-          promoCode: this.applicationService.promoCode
+          promoCode: this.applicationService.promoCode,
+          iftarAmount: this.applicationService.iftarDonationAmount.value as number
         }))
       ),
       map(({data}) => data),
@@ -92,7 +93,8 @@ export class SetupService {
           donationLength: this.applicationService.donationLength.value as DonationLength,
           status: "application",
           successURL: this.successURL,
-          promoCode: this.applicationService.promoCode
+          promoCode: this.applicationService.promoCode,
+          iftarAmount: this.applicationService.iftarDonationAmount.value as number,
         }))
       ),
       map(({data}) => {

@@ -1,14 +1,14 @@
 import * as functions from "firebase-functions";
 import {
   AdminAddManualReq, AdminAddManualRes,
-  AdminDecrementCounterReq,
-  AdminDecrementCounterRes,
+  AdminDecrementCountersReq,
+  AdminDecrementCountersRes,
   AdminDigitalWallReq,
   AdminDigitalWallRes, AdminUploadDigitalWallReq, AdminUploadDigitalWallRes,
 } from "../api-types";
 import {checkPassword} from "./password";
 import {db} from "../database";
-import {decrementCounter as decrementCounterFn, generateIDs} from "../counter";
+import {decrementIDsAndPledges, incrementIDsAndPledges} from "../counter";
 import {ManualDonation} from "../helpers";
 import * as stream from "stream";
 import {storage} from "../firebase";
@@ -49,13 +49,22 @@ export const digitalWall = functions.https.onCall(
   }
 );
 
-export const decrementCounter = functions.https.onCall(
-  async (data: AdminDecrementCounterReq): Promise<AdminDecrementCounterRes> => {
+export const decrementCounters = functions.https.onCall(
+  async (
+    data: AdminDecrementCountersReq
+  ): Promise<AdminDecrementCountersRes> => {
     checkPassword(data.password);
-    await decrementCounterFn({
-      general: data.counters.general || undefined,
-      waseem: data.counters.waseem || undefined,
-      target: data.counters.target || undefined,
+    await decrementIDsAndPledges({
+      general: !!data.counters.general,
+      waseem: !!data.counters.waseem,
+      manual: !!data.counters.manual,
+      target: !!data.counters.target,
+    }, {
+      general: data.counters.pledges,
+      target: data.counters.targetPledges,
+      waseem: data.counters.waseemPledges,
+      manual: data.counters.manualPledges,
+      iftar: data.counters.iftarPledges,
     });
   }
 );
@@ -66,10 +75,19 @@ export const addManual = functions.https.onCall(
     const obj: ManualDonation = {
       anonymous: data.anonymous, status: "manual", targetID: -1,
       generalID: -1, manualID: -1, onBehalfOf: data.onBehalfOf,
+      amount: data.amount,
     };
     const doc = await db.donations.add(obj);
-    const IDs = await generateIDs(
-      doc.id, true, undefined, true
+    const IDs = await incrementIDsAndPledges(
+      doc.id, {
+        manual: true,
+        target: true,
+        general: true,
+      }, {
+        manual: data.amount,
+        general: data.amount,
+        target: data.amount,
+      }
     );
     await db.donations.doc(doc.id).update({
       manualID: IDs.manual,

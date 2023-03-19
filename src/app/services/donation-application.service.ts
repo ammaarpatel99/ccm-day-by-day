@@ -20,6 +20,7 @@ export class DonationApplicationService implements OnDestroy {
   private _showPresetAmounts: false | number[] = false
   get showPresetAmounts() {return this._showPresetAmounts}
   readonly donationAmount = new FormControl(0)
+  readonly iftarDonationAmount = new FormControl(2.5)
   readonly donationInfo = new FormGroup({
     onBehalfOf: new FormControl("", [Validators.maxLength(25)]),
     anonymous: new FormControl(false, Validators.required)
@@ -87,6 +88,10 @@ export class DonationApplicationService implements OnDestroy {
         Math.floor(control.value * 100) / 100 === control.value ? null
           : {invalidAmount: `Amount cannot have more than 2 decimal places.`}
     ])
+    this.iftarDonationAmount.addValidators(control =>
+      Math.floor(control.value * 100) / 100 === control.value ? null
+        : {invalidAmount: `Amount cannot have more than 2 decimal places.`}
+    );
   }
 
   private setupOnBehalfOf() {

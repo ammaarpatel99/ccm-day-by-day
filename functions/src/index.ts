@@ -22,8 +22,8 @@ import {
 import {configuration} from "./settings";
 import {processSubscriptionInfo} from "./processSubscriptionInfo";
 import {ApplicationWithCustomer, PromoCode, Subscription} from "./helpers";
-import {generateIDs} from "./counter";
 import {sendConfirmationEmail} from "./mail";
+import {incrementIDsAndPledges} from "./counter";
 
 export * as admin from "./admin";
 
@@ -94,10 +94,20 @@ export const setupSubscription = functions.https.onCall(
     const paymentInfo = processSubscriptionInfo(docData);
     const setupRes =
       await createSubscriptionSchedule(docData, data.donationID);
-    const IDs = await generateIDs(
-      data.donationID, paymentInfo.meetsTarget || undefined,
-      docData.promoCode === PromoCode.WASEEM || undefined
-    );
+    const amount = paymentInfo.backPay +
+      (paymentInfo.iterations * docData.amount);
+    const iftarAmount = !docData.iftarAmount ? undefined :
+      paymentInfo.backPayIftars +
+      (paymentInfo.iterations * docData.iftarAmount);
+    const IDs = await incrementIDsAndPledges(data.donationID, {
+      general: true, target: paymentInfo.meetsTarget,
+      waseem: docData.promoCode === PromoCode.WASEEM,
+    }, {
+      general: amount,
+      target: paymentInfo.meetsTarget ? amount : 0,
+      waseem: docData.promoCode === PromoCode.WASEEM ? amount : 0,
+      iftar: iftarAmount,
+    });
     const subscription: Subscription = {
       ...docData, status: "subscription", generalID: IDs.general,
       targetID: paymentInfo.meetsTarget ? IDs.target : null,
@@ -106,6 +116,7 @@ export const setupSubscription = functions.https.onCall(
       lumpSum: !setupRes.backpayID ? undefined : {
         amount: paymentInfo.backPay,
         invoiceID: setupRes.backpayID,
+        iftarAmount: paymentInfo.backPayIftars,
       },
       created: setupRes.created,
       emailSent: false,

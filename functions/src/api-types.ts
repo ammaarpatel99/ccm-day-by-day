@@ -12,7 +12,7 @@ export enum APIEndpoints {
   SET_DEFAULT_PAYMENT_METHOD = "setDefaultPayment",
   SETUP_SUBSCRIPTION = "setupSubscription",
   ADMIN_DIGITAL_WALL = "admin-digitalWall",
-  ADMIN_DECREMENT_COUNTER = "admin-decrementCounter",
+  ADMIN_DECREMENT_COUNTERS = "admin-decrementCounters",
   ADMIN_ADD_MANUAL = "admin-addManual",
   ADMIN_UPLOAD_DIGITAL_WALL = "admin-uploadDigitalWall"
 }
@@ -40,16 +40,17 @@ export interface AdminDigitalWallReq {
 }
 export type AdminDigitalWallRes = {ID: number; name: string}[]
 
-export type AdminDecrementCounterReq = {
+export type AdminDecrementCountersReq = {
   password: string;
-  counters: { [key in keyof Counter]: boolean }
+  counters: Partial<Counter>;
 }
-export type AdminDecrementCounterRes = void;
+export type AdminDecrementCountersRes = void;
 
 export type AdminAddManualReq = {
   password: string;
   onBehalfOf: string;
   anonymous: boolean;
+  amount: number;
 }
 export type AdminAddManualRes = {
   generalID: number;

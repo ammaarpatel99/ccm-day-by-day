@@ -6,9 +6,12 @@ import {Functions, httpsCallable} from "@angular/fire/functions";
 import {Firestore} from "@angular/fire/firestore";
 import {
   AdminAddManualReq, AdminAddManualRes,
-  AdminDecrementCounterReq, AdminDecrementCounterRes,
+  AdminDecrementCountersReq,
+  AdminDecrementCountersRes,
   AdminDigitalWallReq,
-  AdminDigitalWallRes, AdminUploadDigitalWallReq, AdminUploadDigitalWallRes,
+  AdminDigitalWallRes,
+  AdminUploadDigitalWallReq,
+  AdminUploadDigitalWallRes,
   APIEndpoints
 } from "../../../../functions/src/api-types";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
@@ -40,15 +43,15 @@ export class AdminService {
     );
   }
 
-  decrementCounter(counters: AdminDecrementCounterReq['counters']) {
+  decrementCounter(counters: AdminDecrementCountersReq['counters']) {
     return this.getPassword().pipe(
       switchMap(password => {
         if (!password) {
           console.log("No Password Entered")
           return EMPTY;
         }
-        return fromPromise(httpsCallable<AdminDecrementCounterReq, AdminDecrementCounterRes>(
-          this.functions, APIEndpoints.ADMIN_DECREMENT_COUNTER
+        return fromPromise(httpsCallable<AdminDecrementCountersReq, AdminDecrementCountersRes>(
+          this.functions, APIEndpoints.ADMIN_DECREMENT_COUNTERS
         )({password, counters}));
       }),
     )

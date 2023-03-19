@@ -9,6 +9,7 @@ export enum DonationLength {
 export interface DonationChoice {
   donationLength: DonationLength;
   amount: number;
+  iftarAmount?: number;
 }
 
 export enum PromoCode {
@@ -30,6 +31,7 @@ interface BaseApplication {
   giftAidConsentDate: number;
   promoCode?: PromoCode;
   tombstone?: boolean;
+  iftarAmount?: number;
 }
 export interface Application extends BaseApplication {
   status: "application";
@@ -47,6 +49,7 @@ interface BaseSubscription extends BaseApplicationWithCustomer {
   lumpSum?: {
     invoiceID: string;
     amount: number;
+    iftarAmount: number;
   };
   generalID: number;
   targetID: number | null;
@@ -71,6 +74,7 @@ export interface ManualDonation {
   tombstone?: boolean;
   anonymous: boolean;
   manualID: number;
+  amount: number;
 }
 
 export type Donation =
@@ -86,6 +90,7 @@ export interface ProcessedSubscriptionInfo {
   startDate: number;
   iterations: number;
   backPay: number;
+  backPayIftars: number;
   meetsTarget: boolean;
   backPayPeriod: {
     start: number;
@@ -133,6 +138,11 @@ export interface Counter {
   target: number;
   waseem: number;
   manual: number;
+  pledges: number;
+  iftarPledges: number;
+  waseemPledges: number;
+  targetPledges: number;
+  manualPledges: number;
 }
 
 export interface StoredIDDoc {

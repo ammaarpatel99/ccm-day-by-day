@@ -47,11 +47,13 @@ respond as soon as possible.<br/>
 <br/>
 <h3>Donation Details:</h3>
 Reference: <em>${donationID}</em><br/>
-${data.lumpSum ?
-    `Lump Sum Donation: <em>£${data.lumpSum.amount}</em><br/>` :
-    ""}
+${data.lumpSum ? `
+Lump Sum Donation: <em>£${data.lumpSum.amount}</em><br/>
+Lump Sum Donation for Iftars: <em>£${data.lumpSum.iftarAmount}</em><br/>
+` : ""}
 ${data.scheduleID ?
     `Daily Amount: <em>£${data.amount}</em><br/>` +
+    `Additional Daily Amount for Iftars: <em>£${data.iftarAmount}</em><br/>` +
     "Start Date: <em>" +
     `${new Date(data.startDate).toLocaleDateString("en-UK")}` +
     "</em><br/>" +
