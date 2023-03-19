@@ -86,9 +86,6 @@ export class AdminService {
     )
   }
 
-  fixCounters() {
-    httpsCallable(this.functions, APIEndpoints.ADMIN_FIX_COUNTERS)()
-  }
 
   constructor(
     private readonly matDialog: MatDialog,
