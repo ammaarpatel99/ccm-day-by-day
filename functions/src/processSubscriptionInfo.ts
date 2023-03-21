@@ -26,18 +26,11 @@ export function processSubscriptionInfo(
       iterations: 10,
     };
   } else if (
-    data.donationLength === DonationLength.FULL_RAMADAN &&
-    data.amount >= config.targetAmount
+    data.donationLength === DonationLength.FULL_RAMADAN
   ) {
     partialRes = {
       startDate: config.ramadanStartDate,
-      meetsTarget: true,
-      iterations: 30,
-    };
-  } else if (data.donationLength === DonationLength.FULL_RAMADAN) {
-    partialRes = {
-      startDate: config.ramadanStartDate,
-      meetsTarget: false,
+      meetsTarget: data.amount >= config.targetAmount,
       iterations: 30,
     };
   } else {
@@ -72,7 +65,7 @@ export function processSubscriptionInfo(
     meetsTarget: partialRes.meetsTarget,
     backPayPeriod: {
       start: partialRes.startDate,
-      end: tomorrow - 1000,
+      end: tomorrow - 1000, // end is today at 23:59:59
     },
   };
 }
