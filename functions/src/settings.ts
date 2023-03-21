@@ -7,8 +7,12 @@ const last10Days = _date.setDate(_date.getDate() + 20);
 
 const donationLengths = () => {
   const lengths = [DonationLength.FULL_RAMADAN];
-  if (differenceInDays(dateToday(), ramadanStartDate) >= 1) {
+  const daysIntoRamadan = differenceInDays(dateToday(), ramadanStartDate);
+  if (daysIntoRamadan >= 1 && daysIntoRamadan < 30) {
     lengths.push(DonationLength.REMAINING_DAYS);
+  }
+  if (daysIntoRamadan >= 20) {
+    lengths.push(DonationLength.LAST_10_DAYS);
   }
   return lengths;
 };

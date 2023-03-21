@@ -2,7 +2,18 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {DonationLength, PromoCode} from "../../../functions/src/api-types";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfigService} from "./config.service";
-import {AsyncSubject, combineLatest, filter, first, map, merge, shareReplay, switchMap, takeUntil, tap} from "rxjs";
+import {
+  AsyncSubject,
+  combineLatest,
+  filter,
+  first,
+  map,
+  merge,
+  shareReplay, startWith,
+  takeUntil,
+  tap,
+  withLatestFrom
+} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
 import {NoBrickDialogComponent} from "../no-brick-dialog/no-brick-dialog.component";
 
@@ -39,6 +50,7 @@ export class DonationApplicationService implements OnDestroy {
     giftAid: new FormControl(false, Validators.required)
   })
   promoCode?: PromoCode;
+  readonly amountToMeetTarget = this._amountToMeetTarget();
 
   constructor(
     private readonly configService: ConfigService,
@@ -122,6 +134,40 @@ export class DonationApplicationService implements OnDestroy {
         }
       }),
       takeUntil(this.destroyed)
+    )
+  }
+
+  private _amountToMeetTarget() {
+    return this.donationLength.valueChanges.pipe(
+      startWith(this.donationLength.value),
+      withLatestFrom(this.configService.config$),
+      map(([length, config]) => {
+        let amount = config.targetAmount;
+        if (length === DonationLength.REMAINING_DAYS) {
+          const date = new Date();
+          date.setHours(0, 0, 0, 0);
+          const remainingDays = 30 - Math.floor(
+            (date.getTime() - config.ramadanStartDate.getTime()) / (1000*60*60*24)
+          );
+          amount = Math.ceil((amount * 30) / remainingDays);
+        } else if (length === DonationLength.LAST_10_DAYS) {
+          amount = Math.ceil((amount * 30) / 10);
+        }
+        if (amount <= config.targetAmount) {
+          amount = config.targetAmount;
+        }
+        if (config.presetAmounts.includes(amount)) {
+          return {
+            show: false,
+            amount
+          }
+        }
+        return {
+          show: true,
+          amount
+        };
+      }),
+      shareReplay(1)
     )
   }
 

@@ -16,7 +16,7 @@
     <button
       mat-raised-button color="primary"
       *ngFor="let donationLength of (showDonationLengths || []); first as isFirst"
-      (click)="selectDonationLength(donationLength)" [class.firstBtn]="isFirst"
+      (click)="selectDonationLength(donationLength)" [class.bigBtn]="isFirst"
     >{{getDonationLengthText(donationLength)}}</button>
   </mat-step>
 
@@ -25,10 +25,18 @@
     <h1 *ngIf="!stepperVertical">Daily Amount</h1>
     <ng-container *ngIf="!!showPresetAmounts">
       <div class="amounts-container">
+        <ng-container *ngIf="(amountToMeetTarget | async) as amountInfo">
+          <button
+            mat-raised-button color="primary"
+            *ngIf="amountInfo.show"
+            class="bigBtn"
+            (click)="setAmount(amountInfo.amount)"
+          >£{{amountInfo.amount}} / day</button>
+        </ng-container>
         <button
           mat-raised-button color="primary"
-          *ngFor="let presetAmount of (showPresetAmounts || []); first as isFirst"
-          [class.firstBtn]="isFirst"
+          *ngFor="let presetAmount of (showPresetAmounts || [])"
+          [class.bigBtn]="(amountToMeetTarget | async)?.amount === presetAmount"
           (click)="setAmount(presetAmount)"
         >£{{presetAmount}} / day</button>
         <button

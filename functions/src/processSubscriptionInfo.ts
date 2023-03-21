@@ -50,6 +50,9 @@ export function processSubscriptionInfo(
       iterations,
     };
   }
+  if (partialRes.iterations * data.amount >= config.targetAmount * 30) {
+    partialRes.meetsTarget = true;
+  }
   if (partialRes.startDate > new Date().getTime()) {
     return {...partialRes, backPay: 0, backPayIftars: 0,
       backPayPeriod: {start: partialRes.startDate, end: partialRes.startDate},

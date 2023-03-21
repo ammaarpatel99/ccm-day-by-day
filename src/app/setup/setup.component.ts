@@ -99,6 +99,8 @@ export class SetupComponent implements AfterViewInit, OnDestroy {
     return this._fullSummary
   }
 
+  readonly amountToMeetTarget = this.applicationService.amountToMeetTarget;
+
   getDonationLengthText(donationLength: DonationLength) {
     switch (donationLength) {
       case DonationLength.FULL_RAMADAN:
