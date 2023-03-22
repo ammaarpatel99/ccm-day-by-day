@@ -170,7 +170,7 @@ export async function incrementIDsAndPledges(
   return {
     general: updateRes.general.old + 1,
     target: updateRes.target.old + 1,
-    manual: updateRes.manualPledges.old + 1,
+    manual: updateRes.manual.old + 1,
     waseem: updateRes.waseem.old + 1,
   };
 }
@@ -184,7 +184,7 @@ export async function incrementIDsAndPledges(
 export async function decrementIDsAndPledges(
   idOptions: IDOptions, pledgeOptions: PledgeOptions
 ) {
-  const idValue = (option?: boolean) => option ? 1 : undefined;
+  const idValue = (option?: boolean) => option ? -1 : undefined;
   const pledgeValue = (amount?: number) => amount ? -1 * amount : undefined;
   await updateCount({
     general: idValue(idOptions.general),

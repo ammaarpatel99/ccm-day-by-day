@@ -37,7 +37,7 @@ export async function createSetupSession(
   customerID: string, successURL: string
 ) {
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card", "bacs_debit", "sepa_debit"],
+    payment_method_types: ["card"],
     mode: "setup",
     success_url: `${successURL}/{CHECKOUT_SESSION_ID}`,
     customer: customerID,
