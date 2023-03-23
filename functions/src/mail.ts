@@ -99,3 +99,55 @@ daybyday@cambridgecentralmosque.org</a><br/>
 `,
   });
 }
+
+/**
+ *
+ * @param {string} email
+ * @param {string} reference
+ * @param {string} onBehalfOf
+ * @param {string} url
+ */
+export async function sendChangePaymentMethodEmail(
+  email: string,
+  reference: string,
+  onBehalfOf: string,
+  url: string,
+) {
+  return await transporter.sendMail({
+    to: email,
+    from: "CCM Day By Day<daybyday@cambridgecentralmosque.org>",
+    subject: "Change Payment Method: Ramadan Day By Day Donations " +
+      "– Cambridge Central Mosque",
+    html: `
+<p>Assalamu ‘alaykum wa rahmatullah wa barakatuh,<br/>
+May the peace, mercy, and blessings of Allah be upon you,<br/><br/>
+<em>Thank you for donating to Cambridge Central Mosque.</em><br/>
+<br/>
+<p>
+You have requested to change you payment method for the below
+Day By Day donations:
+</p>
+<p>Reference: ${reference}</p>
+<p>On Behalf Of: ${onBehalfOf}</p>
+<br/>
+<p>
+You can do this by clicking <a href="${url}">here</a>, or using the link below.
+The link is valid for 30 minutes.
+</p>
+<a href="${url}">${url}</a>
+<br/>
+<br/>
+Thank you for supporting Cambridge Central Mosque,<br/>
+Admin Team<br/>
+<a href='https://cambridgecentralmosque.org'>Cambridge Central Mosque</a><br/>
+<a href='mailto:daybyday@cambridgecentralmosque.org'>
+daybyday@cambridgecentralmosque.org</a><br/>
+<img
+ src="https://cambridgecentralmosque.org/wp-content/uploads/2019/03/logo-ccm-retina-2.png"
+ alt="Cambridge Central Mosque Logo"
+ ><br/>
+<strong>©The Cambridge Mosque Trust | Registered UK Charity No. 1164931</strong>
+</p>
+`,
+  });
+}

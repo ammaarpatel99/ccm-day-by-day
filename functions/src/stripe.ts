@@ -2,10 +2,10 @@ import Stripe from "stripe";
 import {Application, ApplicationWithCustomer} from "./helpers";
 import {processSubscriptionInfo} from "./processSubscriptionInfo";
 
-const stripeKey = "sk_live_51MOiitFg1jrvwujs2e2XNzPQlE04EGUKClacqFLfkkGgx" +
-  "lSxNHXHYXrVkmlUq7dRYFn8C4jlB9MApFcZLER0vbBD00QprYQEaj";
-const stripeDayByDayProduct = "prod_NPVkEw65yq837V";
-const stripeIftarProduct = "prod_NX1cJuwZ41XYiZ";
+const stripeKey = "sk_test_51MOiitFg1jrvwujseQk1ciZYu1dmlmaamxe7" +
+  "kaW1jDsYwp59HtyBqKw6JsAxUEHVswfPvaI6XVpgVUYCC11kfVme00KC97UJxx";
+const stripeDayByDayProduct = "prod_NPRoJ1nQPSgEbK";
+const stripeIftarProduct = "prod_NTzBSDHNILIJov";
 const stripe = new Stripe(stripeKey, {apiVersion: "2022-11-15"});
 
 /**
@@ -104,6 +104,11 @@ export async function createSubscriptionSchedule(
       });
     }
     invoice = await stripe.invoices.finalizeInvoice(invoice.id);
+    try {
+      await stripe.invoices.pay(invoice.id);
+    } catch (e) {
+      console.log(e);
+    }
   }
   let subscription: Stripe.Response<Stripe.SubscriptionSchedule> | undefined;
   if (paymentInfo.iterations > 0) {
@@ -154,4 +159,26 @@ export async function createSubscriptionSchedule(
     subscriptionScheduleID: subscription?.id,
     created: (invoice?.created || subscription?.created || 0) * 1000,
   };
+}
+
+/**
+ *
+ * @param {string} customerID
+ * @param {string} backURL
+ */
+export async function changePaymentMethod(
+  customerID: string,
+  backURL: string,
+) {
+  const session = await stripe.billingPortal.sessions.create({
+    customer: customerID,
+    return_url: backURL,
+    flow_data: {
+      type: "payment_method_update",
+      after_completion: {
+        type: "hosted_confirmation",
+      },
+    },
+  });
+  return session.url;
 }

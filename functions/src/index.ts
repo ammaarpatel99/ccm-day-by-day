@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import {db} from "./database";
 import {
+  changePaymentMethod as stripeChangePaymentMethod,
   createSetupSession,
   createSubscriptionSchedule,
   makeCustomer,
@@ -18,11 +19,13 @@ import {
   SetupPaymentRes,
   SetupSubscriptionReq,
   SetupSubscriptionRes,
+  ChangePaymentMethodRes,
+  ChangePaymentMethodReq,
 } from "./api-types";
 import {configuration} from "./settings";
 import {processSubscriptionInfo} from "./processSubscriptionInfo";
 import {ApplicationWithCustomer, PromoCode, Subscription} from "./helpers";
-import {sendConfirmationEmail} from "./mail";
+import {sendChangePaymentMethodEmail, sendConfirmationEmail} from "./mail";
 import {incrementIDsAndPledges} from "./counter";
 
 export * as admin from "./admin";
@@ -128,5 +131,25 @@ export const setupSubscription = functions.https.onCall(
     subscription.emailSent = true;
     await doc.set(subscription);
     return {...subscription, ...paymentInfo};
+  }
+);
+
+export const changePaymentMethod = functions.https.onCall(
+  async (data: ChangePaymentMethodReq): Promise<ChangePaymentMethodRes> => {
+    const donation = (await db.donations.doc(data.donationID).get()).data();
+    if (!donation || donation.status !== "subscription") {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Donation ID is not for a valid Day By Day subscription",
+      );
+    }
+    const redirectURL =
+      await stripeChangePaymentMethod(donation.customerID, data.backURL);
+    await sendChangePaymentMethodEmail(
+      donation.email,
+      data.donationID,
+      donation.onBehalfOf,
+      redirectURL,
+    );
   }
 );

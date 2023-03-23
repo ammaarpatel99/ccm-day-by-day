@@ -14,7 +14,8 @@ export enum APIEndpoints {
   ADMIN_DIGITAL_WALL = "admin-digitalWall",
   ADMIN_DECREMENT_COUNTERS = "admin-decrementCounters",
   ADMIN_ADD_MANUAL = "admin-addManual",
-  ADMIN_UPLOAD_DIGITAL_WALL = "admin-uploadDigitalWall"
+  ADMIN_UPLOAD_DIGITAL_WALL = "admin-uploadDigitalWall",
+  CHANGE_PAYMENT_METHOD = "changePaymentMethod"
 }
 
 export type ConfigReq = void;
@@ -66,3 +67,10 @@ export interface AdminUploadDigitalWallReq {
 export interface AdminUploadDigitalWallRes {
   url: string;
 }
+
+export interface ChangePaymentMethodReq {
+  donationID: string;
+  backURL: string;
+}
+
+export type ChangePaymentMethodRes = void;

@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import {SetupComponent} from "./setup/setup.component";
 import {LoadingComponent} from "./loading/loading.component";
 import {PaymentSetupComponent} from "./payment-setup/payment-setup.component";
+import {ChangePaymentMethodComponent} from "./change-payment-method/change-payment-method.component";
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
     path: '',
     pathMatch: 'full',
     component: LoadingComponent
+  },
+  {
+    path: 'change-payment-method',
+    component: ChangePaymentMethodComponent
   },
   {
     path: ':promoCode',

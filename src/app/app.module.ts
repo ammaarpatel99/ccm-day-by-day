@@ -23,6 +23,7 @@ import {MatProgressBarModule} from "@angular/material/progress-bar";
 import { NoBrickDialogComponent } from './no-brick-dialog/no-brick-dialog.component';
 import {MatDialogModule} from "@angular/material/dialog";
 import {connectFirestoreEmulator, provideFirestore, getFirestore} from "@angular/fire/firestore";
+import { ChangePaymentMethodComponent } from './change-payment-method/change-payment-method.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import {connectFirestoreEmulator, provideFirestore, getFirestore} from "@angular
     SetupComponent,
     LoadingComponent,
     PaymentSetupComponent,
-    NoBrickDialogComponent
+    NoBrickDialogComponent,
+    ChangePaymentMethodComponent
   ],
     imports: [
         BrowserModule,

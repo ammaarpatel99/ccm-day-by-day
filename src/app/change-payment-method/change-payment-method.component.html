@@ -1,0 +1,35 @@
+<div class="container">
+  <h1 class="mat-headline-3">Change Payment Method</h1>
+    <ng-container *ngIf="status === 'start'">
+      <p>Please enter the reference for the donation. You will be emailed a link to change the payment method for the selected donation.</p>
+      <mat-form-field>
+        <mat-label>Donation Reference</mat-label>
+        <input matInput [formControl]="donationID">
+      </mat-form-field>
+      <button mat-raised-button color="primary" [disabled]="donationID.invalid" (click)="changePaymentMethod()">
+        SUBMIT
+      </button>
+    </ng-container>
+    <ng-container *ngIf="status === 'loading'">
+      <mat-spinner></mat-spinner>
+    </ng-container>
+    <ng-container *ngIf="status === 'success'">
+      <h3>
+        Your request to change your payment method has been accepted.
+        <b>Please check your email</b> for a link to change the card details for the donation you have selected.
+      </h3>
+      <button mat-stroked-button color="primary" (click)="status = 'start'" class="largeBtn">
+        SELECT A DIFFERENT DONATION REFERENCE
+      </button>
+    </ng-container>
+    <ng-container *ngIf="status === 'error'">
+      <h3>
+        There was an issue processing your request to change your payment method.
+        <b>Please check your internet connection and make sure your donation reference is correct.</b>
+      </h3>
+      <button mat-stroked-button color="primary" (click)="status = 'start'">
+        RETRY
+      </button>
+    </ng-container>
+</div>
+
