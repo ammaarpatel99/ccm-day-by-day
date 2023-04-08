@@ -11,9 +11,7 @@ const donationLengths = () => {
   if (daysIntoRamadan >= 1 && daysIntoRamadan < 30) {
     lengths.push(DonationLength.REMAINING_DAYS);
   }
-  if (daysIntoRamadan >= 20) {
-    lengths.push(DonationLength.LAST_10_DAYS);
-  }
+  lengths.push(DonationLength.LAST_10_DAYS);
   return lengths;
 };
 
