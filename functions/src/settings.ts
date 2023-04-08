@@ -17,8 +17,8 @@ const donationLengths = () => {
   return lengths;
 };
 
-const minimumAmount = 30;
-const presetAmounts = [30, 40, 50];
+const minimumAmount = 5;
+const presetAmounts = [30, 20, 10];
 const targetAmount = 30;
 
 const brickLimit = 300;
