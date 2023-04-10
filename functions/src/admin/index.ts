@@ -1,10 +1,15 @@
 import * as functions from "firebase-functions";
 import {
-  AdminAddManualReq, AdminAddManualRes,
+  AdminAddManualReq,
+  AdminAddManualRes,
   AdminDecrementCountersReq,
   AdminDecrementCountersRes,
   AdminDigitalWallReq,
-  AdminDigitalWallRes, AdminUploadDigitalWallReq, AdminUploadDigitalWallRes,
+  AdminDigitalWallRes,
+  AdminGiftAidReq,
+  AdminGiftAidRes,
+  AdminUploadDigitalWallReq,
+  AdminUploadDigitalWallRes,
 } from "../api-types";
 import {checkPassword} from "./password";
 import {db} from "../database";
@@ -46,6 +51,34 @@ export const digitalWall = functions.https.onCall(
       }
     }
     return results;
+  }
+);
+
+export const giftAid = functions.https.onCall(
+  async (data: AdminGiftAidReq): Promise<AdminGiftAidRes> => {
+    checkPassword(data.password);
+    const donations = await db.donations.get();
+    const donors: AdminGiftAidRes = [];
+    donations.docs.forEach((doc) => {
+      const data = doc.data();
+      if (data.status != "subscription" ||
+        !data.giftAid
+      ) {
+        return;
+      }
+      donors.push({
+        address: data.address,
+        dateOfConsent: data.giftAidConsentDate,
+        email: data.email,
+        emailSent: data.emailSent,
+        firstName: data.firstName,
+        phone: data.phone,
+        postcode: data.postcode,
+        stripeID: data.customerID,
+        surname: data.surname,
+      });
+    });
+    return donors;
   }
 );
 

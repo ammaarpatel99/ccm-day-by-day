@@ -15,7 +15,8 @@ export enum APIEndpoints {
   ADMIN_DECREMENT_COUNTERS = "admin-decrementCounters",
   ADMIN_ADD_MANUAL = "admin-addManual",
   ADMIN_UPLOAD_DIGITAL_WALL = "admin-uploadDigitalWall",
-  CHANGE_PAYMENT_METHOD = "changePaymentMethod"
+  CHANGE_PAYMENT_METHOD = "changePaymentMethod",
+  ADMIN_GIFT_AID = "admin-giftAid"
 }
 
 export type ConfigReq = void;
@@ -40,6 +41,21 @@ export interface AdminDigitalWallReq {
   password: string;
 }
 export type AdminDigitalWallRes = {ID: number; name: string}[]
+
+export interface AdminGiftAidReq {
+  password: string;
+}
+export type AdminGiftAidRes = {
+  firstName: string;
+  surname: string;
+  stripeID: string;
+  address: string;
+  postcode: string;
+  email: string;
+  phone: string;
+  dateOfConsent: number;
+  emailSent: boolean;
+}[]
 
 export type AdminDecrementCountersReq = {
   password: string;

@@ -9,7 +9,7 @@ import {
   AdminDecrementCountersReq,
   AdminDecrementCountersRes,
   AdminDigitalWallReq,
-  AdminDigitalWallRes,
+  AdminDigitalWallRes, AdminGiftAidReq, AdminGiftAidRes,
   AdminUploadDigitalWallReq,
   AdminUploadDigitalWallRes,
   APIEndpoints
@@ -39,6 +39,46 @@ export class AdminService {
         const data = res.data.map(donor => `${donor.ID},${donor.name}`).join("\n")
         const blob = new Blob([data], { type: "text/csv" });
         saveAs(blob, "digital_wall_donors.csv")
+      })
+    );
+  }
+
+  getGiftAidData() {
+    return this.getPassword().pipe(
+      switchMap(password => {
+        if (!password) {
+          console.log("No Password Entered")
+          return EMPTY;
+        }
+        return fromPromise(httpsCallable<AdminGiftAidReq, AdminGiftAidRes>(
+          this.functions, APIEndpoints.ADMIN_GIFT_AID
+        )({password}));
+      }),
+      map(res => {
+        const header = [
+          'stripe ID',
+          'Date of Consent',
+          'First Name',
+          'Surname',
+          'Email',
+          'Phone Number',
+          'Address',
+          'Postcode',
+          'Confirmation Email Sent'
+        ].join(",") + "\n";
+        const data = res.data.map(donor => [
+          donor.stripeID,
+          new Date(donor.dateOfConsent).toLocaleDateString(),
+          donor.firstName,
+          donor.surname,
+          donor.email,
+          donor.phone,
+          donor.address,
+          donor.postcode,
+          donor.emailSent
+        ].join(",")).join("\n")
+        const blob = new Blob([header + data], { type: "text/csv" });
+        saveAs(blob, "gift_aid.csv")
       })
     );
   }
