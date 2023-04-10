@@ -76,7 +76,7 @@ export class AdminService {
           donor.address,
           donor.postcode,
           donor.emailSent
-        ].join(",")).join("\n")
+        ].map(x => `"${x}"`).join(",")).join("\n")
         const blob = new Blob([header + data], { type: "text/csv" });
         saveAs(blob, "gift_aid.csv")
       })
