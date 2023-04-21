@@ -24,6 +24,7 @@ import { NoBrickDialogComponent } from './no-brick-dialog/no-brick-dialog.compon
 import {MatDialogModule} from "@angular/material/dialog";
 import {connectFirestoreEmulator, provideFirestore, getFirestore} from "@angular/fire/firestore";
 import { ChangePaymentMethodComponent } from './change-payment-method/change-payment-method.component';
+import { SchemeClosedComponent } from './scheme-closed/scheme-closed.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { ChangePaymentMethodComponent } from './change-payment-method/change-pay
     LoadingComponent,
     PaymentSetupComponent,
     NoBrickDialogComponent,
-    ChangePaymentMethodComponent
+    ChangePaymentMethodComponent,
+    SchemeClosedComponent
   ],
     imports: [
         BrowserModule,
