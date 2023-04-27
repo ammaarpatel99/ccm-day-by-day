@@ -1,13 +1,6 @@
 import {SubscriptionSummary} from "./helpers";
-import {createTransport} from "nodemailer";
 import {configuration} from "./settings";
-
-const transporter = createTransport({
-  port: 587, host: "smtp.office365.com", auth: {
-    user: "daybyday@cambridgecentralmosque.org",
-    pass: "Hav06296",
-  },
-});
+import {transporter} from "./secrets/email-transporter.secret";
 
 /**
  * Sends email confirming of subscription

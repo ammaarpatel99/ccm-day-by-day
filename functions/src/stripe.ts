@@ -1,11 +1,12 @@
 import Stripe from "stripe";
 import {Application, ApplicationWithCustomer} from "./helpers";
 import {processSubscriptionInfo} from "./processSubscriptionInfo";
+import {
+  stripeDayByDayProduct,
+  stripeKey,
+  stripeIftarProduct,
+} from "./secrets/stripe.secret";
 
-const stripeKey = "sk_live_51MOiitFg1jrvwujs2e2XNzPQlE04EGUKClacqFLfkkGgx" +
-  "lSxNHXHYXrVkmlUq7dRYFn8C4jlB9MApFcZLER0vbBD00QprYQEaj";
-const stripeDayByDayProduct = "prod_NPVkEw65yq837V";
-const stripeIftarProduct = "prod_NX1cJuwZ41XYiZ";
 const stripe = new Stripe(stripeKey, {apiVersion: "2022-11-15"});
 
 /**
