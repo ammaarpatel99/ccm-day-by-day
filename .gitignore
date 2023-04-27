@@ -49,3 +49,6 @@ ui-debug.log
 .firebase
 *-debug.log
 .runtimeconfig.json
+
+# secrets
+**/*.secret.ts
