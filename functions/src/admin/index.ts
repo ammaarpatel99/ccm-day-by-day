@@ -5,7 +5,7 @@ import {
   AdminDecrementCountersReq,
   AdminDecrementCountersRes,
   AdminDigitalWallReq,
-  AdminDigitalWallRes,
+  AdminDigitalWallRes, AdminGetDataReq, AdminGetDataRes,
   AdminGiftAidReq,
   AdminGiftAidRes,
   AdminUploadDigitalWallReq,
@@ -14,9 +14,10 @@ import {
 import {checkPassword} from "./password";
 import {db} from "../database";
 import {decrementIDsAndPledges, incrementIDsAndPledges} from "../counter";
-import {ManualDonation} from "../helpers";
+import {ManualDonation, Subscription} from "../helpers";
 import * as stream from "stream";
 import {storage} from "../firebase";
+import {paymentsByCustomer} from "../stripe";
 
 export const digitalWall = functions.https.onCall(
   async (data: AdminDigitalWallReq): Promise<AdminDigitalWallRes> => {
@@ -171,3 +172,23 @@ export const uploadDigitalWall = functions.https.onCall(
     return {url};
   }
 );
+
+export const getData = functions.https.onCall(async (
+  data: AdminGetDataReq
+): Promise<AdminGetDataRes> => {
+  checkPassword(data.password);
+  const donations = await db.donations.get();
+  const res: AdminGetDataRes["data"] = await Promise.all(donations.docs
+    .filter((doc) => {
+      const data = doc.data();
+      return !(data.status === "application_with_customer" ||
+        data.status === "manual" ||
+        data.status === "application");
+    })
+    .map((doc) => doc.data() as Subscription)
+    .map(async (data) => {
+      const amount = await paymentsByCustomer(data.customerID);
+      return {...data, estimatedTotal: amount};
+    }));
+  return {data: res};
+});

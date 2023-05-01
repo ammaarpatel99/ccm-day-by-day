@@ -183,3 +183,21 @@ export async function changePaymentMethod(
   });
   return session.url;
 }
+
+/**
+ *
+ * @param {string} customerID
+ */
+export async function paymentsByCustomer(customerID: string) {
+  let amount = 0;
+  const charges = await stripe.charges.list({
+    customer: customerID,
+    limit: 100,
+  });
+  charges.data.forEach((charge) => {
+    if (charge.status === "succeeded" && !charge.refunded) {
+      amount += charge.amount;
+    }
+  });
+  return amount;
+}

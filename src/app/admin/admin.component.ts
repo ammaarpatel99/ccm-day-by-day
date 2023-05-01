@@ -61,6 +61,10 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.adminService.getGiftAidData().subscribe()
   }
 
+  downloadFullData() {
+    this.adminService.getFullData({}).subscribe()
+  }
+
   onSoundChange() {
     // if (this.sound) this.audio.play()
   }

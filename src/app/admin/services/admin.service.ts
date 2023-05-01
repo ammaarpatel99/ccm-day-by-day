@@ -9,10 +9,11 @@ import {
   AdminDecrementCountersReq,
   AdminDecrementCountersRes,
   AdminDigitalWallReq,
-  AdminDigitalWallRes, AdminGiftAidReq, AdminGiftAidRes,
+  AdminDigitalWallRes, AdminGetDataReq, AdminGiftAidReq, AdminGiftAidRes,
   AdminUploadDigitalWallReq,
   AdminUploadDigitalWallRes,
-  APIEndpoints
+  APIEndpoints,
+  AdminGetDataRes
 } from "../../../../functions/src/api-types";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
 import {saveAs} from 'file-saver-es';
@@ -123,6 +124,81 @@ export class AdminService {
         )({...data, password}))
       }),
       map(res => res.data.url)
+    )
+  }
+
+  getFullData(data: Omit<AdminGetDataReq, "password">) {
+    return this.getPassword().pipe(
+      switchMap(password => {
+        if (!password) {
+          console.log("No Password Entered")
+          return EMPTY;
+        }
+        return fromPromise(httpsCallable<AdminGetDataReq, AdminGetDataRes>(
+          this.functions, APIEndpoints.ADMIN_GET_DATA
+        )({...data, password}))
+      }),
+      map(res => res.data.data),
+      map(res => {
+        const header = [
+          'Customer ID',
+          'First Name',
+          'Surname',
+          'Email',
+          'Phone Number',
+          'Address',
+          'Postcode',
+          'Anonymous',
+          'Gift Aid Consent',
+          'Gift Aid Consent Date',
+          'Subscription Created On',
+          'Cancelled Early',
+          'Donation Length',
+          'Daily Amount',
+          'Daily Iftar Amount',
+          'Lump Sum Amount',
+          'Lump Sum Iftar Amount',
+          'Lump Sum Invoice ID',
+          'Confirmation Email Sent',
+          'Estimated Total Paid (including transaction fees)',
+          'On Behalf Of',
+          'Promo Code',
+          'General ID',
+          'Target ID',
+          'Schedule ID',
+          'Waseem ID'
+        ].join(",") + "\n";
+        const data = res.map(donor => [
+          donor.customerID,
+          donor.firstName,
+          donor.surname,
+          donor.email,
+          donor.phone,
+          donor.address,
+          donor.postcode,
+          donor.anonymous,
+          donor.giftAid,
+          new Date(donor.giftAidConsentDate).toLocaleDateString(),
+          new Date(donor.created).toLocaleDateString(),
+          donor.tombstone,
+          donor.donationLength,
+          donor.amount / 100,
+          donor.iftarAmount ? donor.iftarAmount / 100 : 0,
+          donor.lumpSum?.amount ? donor.lumpSum.amount / 100 : 0,
+          donor.lumpSum?.iftarAmount ? donor.lumpSum.iftarAmount / 100 : 0,
+          donor.lumpSum?.invoiceID,
+          donor.emailSent,
+          donor.estimatedTotal / 100,
+          donor.onBehalfOf,
+          donor.promoCode,
+          donor.generalID,
+          donor.targetID,
+          donor.scheduleID,
+          donor.waseemID
+        ].map(x => `"${x}"`).join(",")).join("\n")
+        const blob = new Blob([header + data], { type: "text/csv" });
+        saveAs(blob, "full_data.csv")
+      })
     )
   }
 

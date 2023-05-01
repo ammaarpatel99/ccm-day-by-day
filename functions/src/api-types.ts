@@ -1,6 +1,6 @@
 import {configuration} from "./settings";
 import {
-  Application, ApplicationSummary, SubscriptionSummary, Counter,
+  Application, ApplicationSummary, SubscriptionSummary, Counter, Subscription,
 } from "./helpers";
 export {DonationLength, PromoCode, Counter} from "./helpers";
 
@@ -16,7 +16,8 @@ export enum APIEndpoints {
   ADMIN_ADD_MANUAL = "admin-addManual",
   ADMIN_UPLOAD_DIGITAL_WALL = "admin-uploadDigitalWall",
   CHANGE_PAYMENT_METHOD = "changePaymentMethod",
-  ADMIN_GIFT_AID = "admin-giftAid"
+  ADMIN_GIFT_AID = "admin-giftAid",
+  ADMIN_GET_DATA = "admin-getData",
 }
 
 export type ConfigReq = void;
@@ -90,3 +91,11 @@ export interface ChangePaymentMethodReq {
 }
 
 export type ChangePaymentMethodRes = void;
+
+export interface AdminGetDataReq {
+  password: string;
+}
+
+export interface AdminGetDataRes {
+  data: (Subscription & {estimatedTotal: number})[]
+}
